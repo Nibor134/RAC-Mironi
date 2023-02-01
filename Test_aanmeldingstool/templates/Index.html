@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="/static/basic.css" type="text/css">
+  </head>
+  <body>
+
+    <div class="slider">
+      <h1>Nicky Aardse</h1>
+        <input type="range" min="0" max="1" step="1" value="0" id="slider">
+        <p id="status">Niet Aanwezig</p>
+    </div>
+
+    <div class="slider">
+      <h1>Milan Kreukniet</h1>
+        <input type="range" min="0" max="1" step="1" value="0" id="slider2">
+        <p id="status2">Niet Aanwezig</p>
+    </div>
+
+    <div class="slider">
+      <h1>Robin Winkels</h1>
+        <input type="range" min="0" max="1" step="1" value="0" id="slider3">
+        <p id="status3">Niet Aanwezig</p>
+    </div>
+    <script>
+      const slider = document.getElementById("slider");
+      const status = document.getElementById("status");
+
+      slider.addEventListener("input", function() {
+        status.innerHTML = this.value === "0" ? "Niet Aanwezig" : "Aanwezig";
+      });
+
+      const slider2 = document.getElementById("slider2");
+      const status2 = document.getElementById("status2");
+  
+      slider2.addEventListener("input", function() {
+        status2.innerHTML = this.value === "0" ? "Niet Aanwezig" : "Aanwezig";
+        });
+      const slider3 = document.getElementById("slider3");
+      const status3 = document.getElementById("status3");
+  
+      slider3.addEventListener("input", function() {
+        status3.innerHTML = this.value === "0" ? "Niet Aanwezig" : "Aanwezig";
+        });
+      </script>
+  </body>
+</html>
