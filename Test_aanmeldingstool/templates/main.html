@@ -1,0 +1,24 @@
+<html>
+    <head>
+        <title>Check In</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+        <script>
+            var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+            document.addEventListener('DOMContentLoaded', function() {
+                var form = document.querySelector('form');
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    var studentName = form.elements.student_name.value;
+                    socket.emit('checkin', {student_name: studentName});
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <form>
+            <input type="text" name="student_name" placeholder="Enter your name">
+            <input type="submit" value="Check In">
+        </form>
+    </body>
+</html>
