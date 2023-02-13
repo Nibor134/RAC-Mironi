@@ -4,20 +4,41 @@ import sqlite3
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO
 from lib.tablemodel import DatabaseModel
+from flask_restful import Api, Resource
 
 app = Flask(__name__)
+api = Api(app)
+
 app.config['SECRET_KEY'] = 'HogeschoolRotterdam'
 socketio = SocketIO(app)
 
 attendance = {}
-start_time = datetime.time(9, 0)  # 9:00 AM
-end_time = datetime.time(17, 0)  # 5:00 PM
+start_time = datetime.time(9, 0) 
+end_time = datetime.time(17, 0) 
 
 DATABASE = os.path.join(app.root_path, 'databases', 'test_database.db')
 dbm = DatabaseModel(DATABASE)
 
 conn = sqlite3.connect('Test_aanmeldingstool/databases/test_database.db') 
 c = conn.cursor()
+
+class Attendances(Resource):
+    def get(self, attendance_id):
+        if attendance_id in attendance:
+            return {attendance_id: attendance[attendance_id]}
+        else:
+            return {"error": "Attendancee not found"}, 404
+
+    def put(self, attendance_id):
+        attendance[attendance_id] = request.form['data']
+        return {attendance_id: attendance[attendance_id]}
+    
+    def delete(self, attendance_id):
+        if attendance_id in attendance:
+            del attendance[attendance_id]
+            return {"result": "Attendance deleted"}
+        else:
+            return {"error": "Attendancee not found"}, 404
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -33,13 +54,16 @@ def on_checkin(data):
 def attendance_list():
     return render_template('attendance.html', attendance=attendance)
 
+
+api.add_resource(Attendances, "/attendance/<string:attendance_id>")
+
 @app.route('/export', methods=['GET', 'POST'])
 def export_attendance():
     if request.method == 'POST':
         class_name = request.form.get('class_name')
         now = datetime.datetime.now()
         date_string = now.strftime('%Y%m%d')
-        time_string = now.strftime('%H:%M:%S')
+        #time_string = now.strftime('%H:%M:%S')
         filename = 'Test_aanmeldingstool/databases/test_database.db'
         table_name = class_name + '_' + date_string 
 
