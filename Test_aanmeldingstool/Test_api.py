@@ -1,6 +1,6 @@
 import sqlite3
-from flask import Flask, request, jsonify #added to top of file
-from flask_cors import CORS #added to top of file
+from flask import Flask, request, jsonify 
+from flask_cors import CORS 
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
@@ -14,9 +14,8 @@ def insert_student(student):
     try:
         conn = connect_to_db()
         cur = conn.cursor()
-        cur.execute('''INSERT INTO Studenten (Student_id, Voornaam, Achternaam, Studentnummer)
-        VALUES (?, ?, ?, ?)", 
-        (Student['Student_id'], Student['Voornaam'], Student['Achternaam'], Student['Studentnummer']) ''')
+        cur.execute('''INSERT INTO Studenten (Student_id, Voornaam, Achternaam, Studentnummer) VALUES (?, ?, ?, ?)''', 
+                (student['Student_id'], student['Voornaam'], student['Achternaam'], student['Studentnummer']))
         conn.commit()
         inserted_student = get_student_by_id(cur.lastrowid)
     except:
@@ -134,4 +133,4 @@ def api_delete_student(student_id):
 if __name__ == "__main__":
     app.debug = True
     app.run(debug=True)
-    app.run() #run app
+    app.run()
