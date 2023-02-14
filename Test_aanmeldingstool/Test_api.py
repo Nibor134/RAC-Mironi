@@ -76,9 +76,9 @@ def update_student(student):
         conn = connect_to_db()
         cur = conn.cursor()
         cur.execute('''UPDATE Studenten SET voornaam = ?, Achternaam = ?, Studentnummer = 
-                     ? WHERE student_id = ?",  
+                     ? WHERE student_id = ?''',  
                      (student["Voornaam"], student["Achternaam"], student["Studentnummer"],
-                     student["Student_id"],)''')
+                     student["Student_id"],))
         conn.commit()
         #return the student
         updated_student = get_student_by_id(student["Student_id"])
