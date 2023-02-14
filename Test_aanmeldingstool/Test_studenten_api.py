@@ -1,9 +1,23 @@
 import sqlite3
 from flask import Flask, request, jsonify 
+from flask_httpauth import HTTPBasicAuth
 from flask_cors import CORS 
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
+auth = HTTPBasicAuth()
+
+# Define a dictionary of users and their passwords
+users = {
+    "admin": "password",
+    "user1": "password1",
+    "user2": "password2"
+}
+
+@auth.verify_password
+def verify_password(username, password):
+    if username in users and password == users[username]:
+        return username
 
 def connect_to_db():
     conn = sqlite3.connect('Test_aanmeldingstool/databases/test_database.db')
@@ -109,19 +123,23 @@ def delete_student(student_id):
 
 
 @app.route('/api/studenten', methods=['GET'])
+@auth.login_required
 def api_get_studenten():
     return jsonify(get_studenten())
 
 @app.route('/api/studenten/<student_id>', methods=['GET'])
+@auth.login_required
 def api_get_student(student_id):
     return jsonify(get_student_by_id(student_id))
 
 @app.route('/api/studenten/add',  methods = ['POST'])
+@auth.login_required
 def api_add_student():
     student = request.get_json()
     return jsonify(insert_student(student))
 
 @app.route('/api/studenten/update',  methods = ['PUT'])
+@auth.login_required
 def api_update_student():
     student = request.get_json()
     return jsonify(update_student(student))
