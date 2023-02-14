@@ -15,7 +15,7 @@ def insert_student(student):
         conn = connect_to_db()
         cur = conn.cursor()
         cur.execute('''INSERT INTO Studenten (Student_id, Voornaam, Achternaam, Studentnummer)
-        VALUES (?, ?, ?, ?, ?)", 
+        VALUES (?, ?, ?, ?)", 
         (Student['Student_id'], Student['Voornaam'], Student['Achternaam'], Student['Studentnummer']) ''')
         conn.commit()
         inserted_student = get_student_by_id(cur.lastrowid)
