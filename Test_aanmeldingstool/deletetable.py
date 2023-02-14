@@ -8,7 +8,7 @@ c = conn.cursor()
 # create table named address of customers with
 # 4 columns id,name age and address
 # drop table
-conn.execute("DROP TABLE attendance")
+conn.execute("DROP TABLE docenten")
   
 # close the connection
 conn.close()
