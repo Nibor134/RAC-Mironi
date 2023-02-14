@@ -44,7 +44,7 @@ def get_studenten():
             student["Voornaam"] = i["Voornaam"]
             student["Achternaam"] = i["Achternaam"]
             student["Studentnummer"] = i["Studentnummer"]
-            student.append(student)
+            Studenten.append(student)
 
     except:
         Studenten = []
