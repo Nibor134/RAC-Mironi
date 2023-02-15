@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Login</title>
+  <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+      .body-bg {
+          background-color: #00f7ff;
+          background-image: linear-gradient(315deg, #21e83b 0%, #5fbe7b 74%);
+      }
+  </style>
+</head>
+<body class="body-bg min-h-screen pt-12 md:pt-20 pb-6 px-2 md:px-0" style="font-family:'Lato',sans-serif;">
+  <header class="max-w-lg mx-auto">
+    <section> 
+      </section>
+          <h1 class="text-4xl font-bold text-white text-center">{{ greeting }}!</h1>
+          
+  </header>
+  <main class="bg-white max-w-lg mx-auto p-8 md:p-12 my-10 rounded-lg shadow-2xl">
+   
+    <section>
+      <h3 class="font-bold text-2xl"></h3>
+      
+      <p class="text-gray-600 pt-2"><b>Log alstublieft in om het systeem te gebruiken.</b></p>
+  </section>
+
+  <section class="mt-10">
+    
+            <form action="" method="POST">
+                  {{ form.hidden_tag() }}
+                <p>
+                  <label class="block text-gray-700 text-sm font-bold mb-2 ml-3" for="username"></label>
+                  <div class="mb-6 pt-3 rounded bg-blue-200"> 
+                  <input type="text" class="bg-blue-200 rounded w-full text-gray-700 focus:outline-none border-b-4 border-white focus:border-blue-600 transition duration-500 px-3 pb-3"placeholder="Gebruikersnaam" name="username" value="{{
+                      request.form.username }}">
+                    
+                  
+                    {% for error in form.username.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </p>
+                  </div>
+                  <label class="block text-gray-700 text-sm font-bold mb-2 ml-3" for="password"></label>
+                  <div class="mb-6 pt-3 rounded bg-blue-200">   
+                <p>                  
+                  <input type="password" class="bg-blue-200 rounded w-full text-gray-700 focus:outline-none border-b-4 border-white focus:border-blue-200 transition duration-500 px-3 pb-3" 
+                  placeholder="Wachtwoord" name="password" value="{{ request.form.password }}">
+                    {% for error in form.password.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </p>
+                </div>
+                <section class="mt-12">
+                  <button class="bg-green-400 hover:bg-green-400 text-white font-bold py-2 px-4 rounded shadow-lg hover:shadow-xl transition duration-200" type="submit">Log In</button>
+                
+              </div>
+              </section>
+            </p>
+          </div>
+        </div>
+      </form>
+    </div>
+  </section>
+</main> 
+</body>
+<footer class="p-4 bg-transparent text-center sm:p-6 dark:bg-gray-800">
+  <p>{{ Today }}</p>
+  &nbsp;
+  <img style="display: block; margin-left: auto; margin-right: auto;" src="https://welcome.test-correct.nl/svg/logos/Logo-Test-Correct-2.svg" alt="" />  
+
+</footer>
+</html>
