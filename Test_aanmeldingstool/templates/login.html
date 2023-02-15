@@ -21,15 +21,15 @@
     <div class="container">
         <div class="row">
             <div class="d-flex justify-content-center">
-                <form method="post" action="/login">
+                <form method="POST" action="">
                     <div class="text-center head_login_form">
                         <div>Inloggen</div>
                     </div>
                     <div class="body_login_form">
                         <div class="input_text">Studentnummer of personeelscode</div>
-                            <input class="login_input" type="text" name="Username">
+                            <input class="login_input" type="text" name="Username" value="{{ request.form.studentnummer }}">
                             <div class="input_text">Wachtwoord</div>
-                            <input class="login_input" type="password" name="Password">
+                            <input class="login_input" type="password" name="Password" value="{{ request.form.password }}">
                             <div class="login_button">
                                 <input type="submit" value="Inloggen" name="LoginButton">
                             </div>
