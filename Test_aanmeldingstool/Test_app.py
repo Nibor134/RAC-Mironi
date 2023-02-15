@@ -2,7 +2,10 @@ import sqlite3
 from flask import Flask
 from flask import render_template, url_for, flash, request, redirect, send_file, Response
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
-from lib.classes import *
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, SubmitField, BooleanField
+from wtforms.validators import DataRequired, Length, EqualTo, ValidationError
+from lib.classes import LoginForm, User
 
 # Flask Settings
 LISTEN_ALL = "0.0.0.0"
@@ -21,37 +24,6 @@ def connect_to_db():
     conn = sqlite3.connect('Test_aanmeldingstool/databases/test_database2.db')
     return conn
 
-# Flaskform Login
-class LoginForm(FlaskForm):
- username = StringField('Username',validators=[DataRequired()])
- password = PasswordField('Password',validators=[DataRequired()])
- remember = BooleanField('Remember Me')
- submit = SubmitField('Login')
- def validate_username(self, username):
-    conn = sqlite3.connect('Test_aanmeldingstool/databases/test_database2.db')
-    curs = conn.cursor()
-    curs.execute("SELECT username FROM Users where username = (?)",[username.data])
-    valusername = curs.fetchone()
-    if valusername is None:
-      raise ValidationError('This username ID is not registered. Please register before login')
-
-class User(UserMixin):
-    def __init__(self, id, username, password):
-         self.id = id
-         self.username = username
-         self.password = password
-         self.authenticated = False
-    def is_active(self):
-         return self.is_active()
-    def is_anonymous(self):
-         return False
-    def is_authenticated(self):
-         return self.authenticated
-    def is_active(self):
-         return True
-    def get_id(self):
-         return self.id
-
 @login_manager.user_loader
 def load_user(user_id):
     conn = sqlite3.connect('Test_aanmeldingstool/databases/test_database2.db')
@@ -62,6 +34,11 @@ def load_user(user_id):
       return None
     else:
       return User(int(lu[0]), lu[1], lu[2])
+
+#Main Route  
+@app.route("/", methods=['GET','POST'])
+def redirectpage():
+    return redirect(url_for("login"))
 
 # Login Route
 @app.route("/login", methods=['GET','POST'])
@@ -82,12 +59,7 @@ def login():
         flash('Login Unsuccessfull.')
   return render_template('login.html',title='Login', form=form)
 
-
-#Main Route  
-@app.route("/", methods=['GET','POST'])
-def redirectpage():
-    return redirect(url_for("login"))
-
+# Signup Route
 @app.route("/signup", methods=['GET', 'POST'])
 def signup():
     if request.method == "POST":
