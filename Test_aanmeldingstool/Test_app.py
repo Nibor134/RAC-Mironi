@@ -67,7 +67,7 @@ def load_user(user_id):
 @app.route("/login", methods=['GET','POST'])
 def login():
   if current_user.is_authenticated:
-    return redirect(url_for('main'))
+    return redirect(url_for('dashboard'))
   form = LoginForm()
   if form.validate_on_submit():
     conn = sqlite3.connect('Test_aanmeldingstool/databases/test_database2.db')
@@ -77,7 +77,7 @@ def login():
     Us = load_user(user[0])
     if form.username.data == Us.username and form.password.data == Us.password:
         login_user(Us)
-        return redirect(('main'))
+        return redirect(('dashboard'))
     else:
         flash('Login Unsuccessfull.')
   return render_template('login.html',title='Login', form=form)
@@ -106,6 +106,10 @@ def main():
             #return redirect(url_for("login"))
 
     return render_template("main.html")
+
+@app.route("/dashboard", methods=['GET', 'POST'])
+def dashboard():
+    return render_template("dashboard.html")
 
 @app.route("/logout")
 def logout():
