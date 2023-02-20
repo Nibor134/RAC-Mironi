@@ -5,7 +5,7 @@ app = Flask(__name__)
 app.secret_key = 'your-secret-key'
 
 
-conn = sqlite3.connect('databases/attendence.db', check_same_thread=False)
+conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db', check_same_thread=False)
 c = conn.cursor()
 
 
@@ -33,7 +33,7 @@ def teacher_dashboard():
         return redirect(url_for('login'))
 
 def get_student_by_studentnumber(studentnumber):
-    conn = sqlite3.connect('databases/attendence.db')
+    conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
     cursor = conn.cursor()
     cursor.execute("SELECT Studentnumber, Password FROM Students WHERE Studentnumber = ?", (studentnumber,))
     student = cursor.fetchone()
@@ -44,7 +44,7 @@ def get_student_by_studentnumber(studentnumber):
         return None
 
 def get_teacher_by_email(email):
-    conn = sqlite3.connect('databases/attendence.db')
+    conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
     c = conn.cursor()
     c.execute('SELECT faculty_email, Password FROM faculty WHERE faculty_email = ?', (email,))
     teacher = c.fetchone()
@@ -55,7 +55,7 @@ def get_teacher_by_email(email):
         return None
 
 def get_admin_by_username(username):
-    conn = sqlite3.connect('databases/attendence.db')
+    conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
     c = conn.cursor()
     c.execute('SELECT * FROM admins WHERE username = ?', (username,))
     admin = c.fetchone()
