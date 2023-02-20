@@ -21,7 +21,7 @@
     <div class="container">
         <div class="row">
             <div class="d-flex justify-content-center">
-                <form action="" method="POST">
+                <form method="POST" action="{{ url_for('login') }}">
     
                     <div class="text-center head_login_form">
                         Inloggen
@@ -42,7 +42,7 @@
                         <label for="role">Rol:</label>
                         <select class="login_input" name="role" id="role">
                             <option value="student">Student</option>
-                            <option value="teacher">Teacher</option>
+                            <option value="teacher">Docent</option>
                             <option value="admin">Administrator</option>
                         </select></div>
 
