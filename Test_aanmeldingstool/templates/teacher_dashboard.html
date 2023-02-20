@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Teacher Dashboard</title>
+</head>
+<body>
+	<h1>Welcome, {{ username }}!</h1>
+
+	<h2>Your Courses:</h2>
+	<ul>
+	{% for course in courses %}
+		<li>{{ course.name }}</li>
+	{% endfor %}
+	</ul>
+
+	<h2>Attendance:</h2>
+	<table>
+		<thead>
+			<tr>
+				<th>Student Name</th>
+				<th>Date</th>
+				<th>Status</th>
+			</tr>
+		</thead>
+		<tbody>
+		{% for attendance in attendances %}
+			<tr>
+				<td>{{ attendance.student_name }}</td>
+				<td>{{ attendance.date }}</td>
+				<td>{{ attendance.status }}</td>
+			</tr>
+		{% endfor %}
+		</tbody>
+	</table>
+</body>
+</html>
