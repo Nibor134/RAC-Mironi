@@ -11,7 +11,7 @@ c = conn.cursor()
 
 @app.route('/')
 def index():
-    return render_template('login.html')
+    return render_template('login_test2.html')
 
 # Student dashboard
 @app.route('/student_dashboard')
