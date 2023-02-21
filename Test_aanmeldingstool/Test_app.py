@@ -6,6 +6,10 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField
 from wtforms.validators import DataRequired, Length, EqualTo, ValidationError
 from lib.classes import LoginForm, User
+from lib.tablemodel import DatabaseModel
+import os.path
+
+
 
 # Flask Settings
 LISTEN_ALL = "0.0.0.0"
@@ -16,6 +20,9 @@ FLASK_DEBUG = True
 
 app = Flask(__name__)
 app.secret_key = 'Hogeschoolrotterdam'
+
+DATABASE_FILE = os.path.join(app.root_path, 'databases', 'test_database2.db')
+dbm = DatabaseModel(DATABASE_FILE)
 
 login_manager = LoginManager(app)
 login_manager.login_view = "login"
@@ -82,6 +89,19 @@ def main():
 @app.route("/dashboard", methods=['GET', 'POST'])
 def dashboard():
     return render_template("dashboard.html")
+
+@app.route("/registration")
+def registration():
+    rows, columns = dbm.get_table_content('Studenten')
+    return render_template("registration.html", rows=rows, columns=columns)
+
+@app.route("/presence")
+def presence():
+    return redirect("presence")
+
+@app.route("/student")
+def student():
+    return redirect("student")
 
 @app.route("/logout")
 def logout():

@@ -16,13 +16,16 @@
         <!-- Links -->
         <ul class="navbar-nav">
           <li class="nav-item">
-            <a class="nav-link" href="#">Link 1</a>
+            <a class="nav-link" href="{{ url_for('dashboard') }}">Home</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">Link 2</a>
+            <a class="nav-link" href="{{ url_for('registration') }}">Registratie</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">Link 3</a>
+            <a class="nav-link" href="{{ url_for('presence') }}">Aanwezigheid</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('student') }}">Student</a>
           </li>
         <li class="nav-item topnav-right">
           <a class="nav-link" href="{{ url_for('logout') }}">Uitloggen</a>
@@ -47,14 +50,12 @@
               <td>john.smith@example.com</td>
               <td>Math</
     
-    
-    
     Robin Winkels
     Build me a html webpage that shows a schedule for which classes the student needs to attend at college
     Sure, here's an example of a schedule webpage in HTML:
     
     html
-    Copy code
+    Copy code -->
     <!DOCTYPE html>
     <html>
     <head>
@@ -64,7 +65,7 @@
       <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.6.0/css/bootstrap.min.css">
     </head>
     <body>
-    
+   
       <div class="container mt-4">
         <h1>Class Schedule</h1>
         <table class="table">
@@ -104,6 +105,8 @@
           </tbody>
         </table>
       </div>
-    
-    </body>
+  
 </body>
+</html>
+
+
