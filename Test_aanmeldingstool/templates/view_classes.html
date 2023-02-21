@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>View Classes</title>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <h1>Bekijk lessen</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Les ID</th>
+        <th>Les Naam</th>
+        <th>Docent</th>
+        <th>Datum</th>
+        <th>Start tijd</th>
+        <th>Eind Tijd</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for class in classes %}
+      <tr>
+        <td>{{ class[0] }}</td>
+        <td>{{ class[1] }}</td>
+        <td>{{ class[2] }}</td>
+        <td>{{ class[3] }}</td>
+        <td>{{ class[4] }}</td>
+        <td>{{ class[5] }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</body>
+</html>
