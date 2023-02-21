@@ -66,7 +66,9 @@ def get_admin_by_username(username):
         return {'username': admin[0], 'password': admin[1]}
     else:
         return None
-
+@app.route('/check_in', methods=['GET', 'POST'])
+def check_in():
+    return render_template('checkin.html')
 
 # Route to create new class
 @app.route('/create_class', methods=['GET', 'POST'])

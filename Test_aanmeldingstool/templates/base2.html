@@ -22,13 +22,10 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('teacher_dashboard') }}">Startpagina</a>
+                    <a class="nav-link" href="{{ url_for('student_dashboard') }}">Startpagina</a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('create_class') }}">Creeër een Les</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('view_classes') }}">Bekijk lessen</a>
+                    <a class="nav-link" href="{{ url_for('check_in') }}">Check in</a>
                   </li>
                   <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('logout') }}">Uitloggen</a>
@@ -36,6 +33,7 @@
             </ul>
         </div>
     </nav>
+
 
     <div class="container mt-4">
         {% with messages = get_flashed_messages() %}
