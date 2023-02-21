@@ -1,92 +1,199 @@
+from flask import Flask, render_template, request, session, redirect, url_for,flash
 import sqlite3
-from flask import Flask
-from flask import render_template, url_for, flash, request, redirect, send_file, Response
-from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
-from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField
-from wtforms.validators import DataRequired, Length, EqualTo, ValidationError
-from lib.classes import LoginForm, User
-
-# Flask Settings
-LISTEN_ALL = "0.0.0.0"
-FLASK_IP = LISTEN_ALL
-FLASK_PORT = 81
-FLASK_DEBUG = True
-
+from api_routes import students_api
 
 app = Flask(__name__)
-app.secret_key = 'Hogeschoolrotterdam'
+app.register_blueprint(students_api)
 
-login_manager = LoginManager(app)
-login_manager.login_view = "login"
+app.secret_key = 'your-secret-key'
 
-def connect_to_db():
-    conn = sqlite3.connect('Test_aanmeldingstool/databases/test_database2.db')
-    return conn
+conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db', check_same_thread=False)
+c = conn.cursor()
 
-@login_manager.user_loader
-def load_user(user_id):
-    conn = sqlite3.connect('Test_aanmeldingstool/databases/test_database2.db')
-    curs = conn.cursor()
-    curs.execute("SELECT * from Users where id = (?)",[user_id])
-    lu = curs.fetchone()
-    if lu is None:
-      return None
+@app.route('/')
+def index():
+    return render_template('login_test.html')
+
+# Student dashboard
+@app.route('/student_dashboard')
+def student_dashboard():
+    if 'student_logged_in' in session:
+        student_id = session.get('user_id')
+        return render_template('student_dashboard.html',)
+    elif 'teacher_logged_in' in session:
+        return render_template('student_dashboard.html',)
     else:
-      return User(int(lu[0]), lu[1], lu[2])
+        flash('Invalid login credentials.', 'danger')
+        return redirect(url_for('login'))
 
-#Main Route  
-@app.route("/", methods=['GET','POST'])
-def redirectpage():
-    return redirect(url_for("login"))
+@app.route('/teacher_dashboard')
+def teacher_dashboard():
+    if 'teacher_logged_in' in session:
+        teacher_id = session.get('user_id')
+        return render_template('teacher_dashboard.html',)
+    else:
+        flash('Invalid login credentials.', 'danger')
+        return redirect(url_for('login'))
 
-# Login Route
-@app.route("/login", methods=['GET','POST'])
+def get_student_by_studentnumber(studentnumber):
+    conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT Studentnumber, Password FROM Students WHERE Studentnumber = ?", (studentnumber,))
+    student = cursor.fetchone()
+    conn.close()
+    if student:
+        return {'studentnumber': student[0], 'password': student[1]}
+    else:
+        return None
+
+def get_teacher_by_email(email):
+    conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
+    c = conn.cursor()
+    c.execute('SELECT faculty_email, Password FROM faculty WHERE faculty_email = ?', (email,))
+    teacher = c.fetchone()
+    conn.close()
+    if teacher:
+        return {'email': teacher[0], 'password': teacher[1]}
+    else:
+        return None
+
+def get_admin_by_username(username):
+    conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
+    c = conn.cursor()
+    c.execute('SELECT * FROM admins WHERE username = ?', (username,))
+    admin = c.fetchone()
+    conn.close()
+    if admin:
+        return {'username': admin[0], 'password': admin[1]}
+    else:
+        return None
+
+
+@app.route('/check_in', methods=['GET', 'POST'])
+def check_in():
+    if 'student_logged_in' in session:
+        return render_template('checkin.html')
+    else:
+        flash('Log alstublieft eerst in', 'danger')
+        return redirect(url_for('login'))
+
+# Route to create new class
+@app.route('/create_class', methods=['GET', 'POST'])
+def create_class():
+    if 'teacher_logged_in' in session:
+        if request.method == 'POST':
+            # Get form data
+            class_name = request.form['class_name']
+            date = request.form['date']
+            time = request.form['time']
+            location = request.form['location']
+            
+            # Insert class details into the database
+            conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
+            c = conn.cursor()
+            c.execute('INSERT INTO clas (class_name, date, time, location) VALUES (?, ?, ?, ?)', (class_name, date, time, location))
+            conn.commit()
+            conn.close()
+            
+            return redirect(url_for('teacher_dashboard'))
+            
+        return render_template('create_class.html')
+    else:
+        flash('Log alstublieft eerst in', 'danger')
+        return redirect(url_for('login'))
+
+@app.route('/view_classes')
+def view_classes():
+    if 'teacher_logged_in' in session:
+        conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
+        c = conn.cursor()
+        c.execute('SELECT * FROM Schedule')
+        classes = c.fetchall()
+        conn.close()
+        return render_template('view_classes2.html', classes=classes)
+    else:
+        flash('Log alstublieft eerst in', 'danger')
+        return redirect(url_for('login'))
+
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-  if current_user.is_authenticated:
-    return redirect(url_for('dashboard'))
-  form = LoginForm()
-  if form.validate_on_submit():
-    conn = sqlite3.connect('Test_aanmeldingstool/databases/test_database2.db')
-    curs = conn.cursor()
-    curs.execute("SELECT * FROM Users where username = (?)",    [form.username.data])
-    user = curs.fetchone()
-    Us = load_user(user[0])
-    if form.username.data == Us.username and form.password.data == Us.password:
-        login_user(Us)
-        return redirect(('dashboard'))
-    else:
-        flash('Login Unsuccessfull.')
-  return render_template('login.html',title='Login', form=form)
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        role = request.form['role']
+        
+        if role == 'student':
+            # Validate student login
+            student = get_student_by_studentnumber(username)
+            if student and student['password'] == password:
+                session.clear()
+                session['student_logged_in'] = True
+                session['username'] = student['studentnumber']
+                flash('You were successfully logged in!', 'success')
+                return redirect(url_for('student_dashboard'))
+            else:
+                flash('Invalid login credentials.', 'danger')
+                return redirect(url_for('login'))
 
-# Signup Route
-@app.route("/signup", methods=['GET', 'POST'])
-def signup():
-    if request.method == "POST":
-        if request.form.get('LoginPageButton'):
-            return redirect(url_for("login"))
+        elif role == 'teacher':
+            # Validate teacher login
+            teacher = get_teacher_by_email(username)
+            if teacher and teacher['password'] == password:
+                session.clear()
+                session['teacher_logged_in'] = True
+                session['username'] = teacher['email']
+                flash('You were successfully logged in!', 'success')
+                return redirect(url_for('teacher_dashboard'))
+            else:
+                flash('Invalid login credentials.', 'danger')
+                return redirect(url_for('login'))
 
-    return render_template("signup.html")
+        elif role == 'admin':
+            # Validate admin login
+            admin = get_admin_by_username(username)
+            if admin and admin['password'] == password:
+                session.clear()
+                session['admin_logged_in'] = True
+                session['username'] = admin['username']
+                flash('You were successfully logged in!', 'success')
+                return redirect(url_for('admin_dashboard'))
+            else:
+                flash('Invalid login credentials.', 'danger')
+                return redirect(url_for('login'))
+    
+    return render_template('login_test.html')
 
-
-@app.route("/main", methods=['GET', 'POST'])
-@login_required
-def main():
-    #if request.method == "POST":
-        #if request.form.get('LogoutButton'):
-            #Authed = False
-            #return redirect(url_for("login"))
-
-    return render_template("main.html")
-
-@app.route("/dashboard", methods=['GET', 'POST'])
+@app.route('/dashboard')
 def dashboard():
-    return render_template("dashboard.html")
+    if 'student_logged_in' in session:
+        return render_template('student_dashboard.html')
+    elif 'teacher_logged_in' in session:
+        return render_template('teacher_dashboard.html')
+    elif 'admin_logged_in' in session:
+        return render_template('admin_dashboard.html')
+    else:
+        return redirect(url_for('index'))
 
-@app.route("/logout")
+@app.route('/teacher')
+def teacher():
+    if 'teacher_logged_in' in session:
+        return render_template('teacher_dashboard.html')
+    else:
+        return redirect(url_for('index'))
+
+@app.route('/admin')
+def admin():
+    if 'admin_logged_in' in session:
+        return render_template('admin_dashboard.html')
+    else:
+        return redirect(url_for('index'))
+
+@app.route('/logout')
 def logout():
-    logout_user()
-    return redirect("login")
+    session.clear()
+    flash('You have been logged out.', 'info')
+    return redirect(url_for('login'))
 
-if __name__ == "__main__":
-    app.run(host=FLASK_IP, port=FLASK_PORT, debug=FLASK_DEBUG)
+if __name__ == '__main__':
+    app.run(debug=True)
+    API
