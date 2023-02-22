@@ -4,8 +4,8 @@ from datetime import datetime
 from flask import Flask, request, jsonify, Blueprint
 from flask_cors import CORS
 
-students_api = Blueprint('students_api', __name__)
-CORS(students_api, resources={r"/*": {"origins": "*"}})
+rest_api = Blueprint('rest_api', __name__)
+CORS(rest_api, resources={r"/*": {"origins": "*"}})
 
     
 def connect_to_db():
@@ -212,52 +212,188 @@ def delete_faculty(faculty_id):
 
     return message
 
+import sqlite3
+from flask import Flask, request, jsonify
+from flask_cors import CORS
 
-@students_api.route('/api/students', methods=['GET'])
+app = Flask(__name__)
+CORS(app, resources={r"/*": {"origins": "*"}})
+
+def connect_to_db():
+    conn = sqlite3.connect('Test_aanmeldingstool/databases/test_database.db')
+    return conn
+
+def insert_schedule(schedule):
+    inserted_schedule = {}
+    try:
+        conn = connect_to_db()
+        cur = conn.cursor()
+        cur.execute('''INSERT INTO Schedule (Schedule_id, Course_id, Faculty_id, Room_id, Start_time, End_time, days) 
+                       VALUES (?, ?, ?, ?, ?, ?, ?)''', 
+                    (schedule['Schedule_id'], schedule['Course_id'], schedule['Faculty_id'], 
+                     schedule['Room_id'], schedule['Start_time'], schedule['End_time'], schedule['days']))
+        conn.commit()
+        inserted_schedule = get_schedule_by_id(cur.lastrowid)
+    except:
+        conn.rollback()
+    finally:
+        conn.close()
+
+    return inserted_schedule
+
+def get_schedule():
+    schedules = []
+    try:
+        conn = connect_to_db()
+        conn.row_factory = sqlite3.Row
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM Schedule")
+        rows = cur.fetchall()
+
+        # convert row objects to dictionary
+        for i in rows:
+            schedule = {}
+            schedule["schedule_id"] = i["schedule_id"]
+            schedule["course_id"] = i["course_id"]
+            schedule["faculty_id"] = i["faculty_id"]
+            schedule["room_id"] = i["room_id"]
+            schedule["start_time"] = i["start_time"]
+            schedule["end_time"] = i["end_time"]
+            schedule["days"] = i["days"]
+            schedules.append(schedule)
+    except:
+        schedules = []
+
+    return schedules
+
+def get_schedule_by_id(schedule_id):
+    schedule = {}
+    try:
+        conn = connect_to_db()
+        conn.row_factory = sqlite3.Row
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM Schedule WHERE Schedule_id = ?", 
+                    (schedule_id,))
+        row = cur.fetchone()
+
+        # convert row object to dictionary
+        schedule["Schedule_id"] = row["Schedule_id"]
+        schedule["Course_id"] = row["Course_id"]
+        schedule["Faculty_id"] = row["Faculty_id"]
+        schedule["Room_id"] = row["Room_id"]
+        schedule["Start_time"] = row["Start_time"]
+        schedule["End_time"] = row["End_time"]
+        schedule["days"] = row["days"]
+    except:
+        schedule = {}
+
+    return schedule
+
+def update_schedule(schedule):
+    updated_schedule = {}
+    try:
+        conn = connect_to_db()
+        cur = conn.cursor()
+        cur.execute('''UPDATE Schedule SET Course_id = ?, Faculty_id = ?, Room_id = ?, Start_time = ?, End_time = ?
+                       WHERE Schedule_id = ?''',
+                    (schedule["Course_id"], schedule["Faculty_id"], schedule["Room_id"], 
+                     schedule["Start_time"], schedule["End_time"], schedule["Schedule_id"],))
+        conn.commit()
+        #return the schedule
+        updated_schedule = get_schedule_by_id(schedule["Schedule_id"])
+    except:
+        conn.rollback()
+        updated_schedule = {}
+    finally:
+        conn.close()
+
+    return updated_schedule
+
+def delete_schedule(schedule_id):
+    message = {}
+    try:
+        conn = connect_to_db()
+        conn.execute("DELETE from Schedule WHERE Schedule_id = ?",     
+                      (schedule_id,))
+        conn.commit()
+        message["status"] = "Schedule deleted successfully"
+    except:
+        conn.rollback()
+        message["status"] = "Cannot delete Schedule"
+    finally:
+        conn.close()
+
+    return message
+
+
+
+@rest_api.route('/api/students', methods=['GET'])
 def api_get_students():
     return jsonify(get_students())
 
-@students_api.route('/api/students/<student_id>', methods=['GET'])
+@rest_api.route('/api/students/<student_id>', methods=['GET'])
 def api_get_student(student_id):
     return jsonify(get_student_by_id(student_id))
 
-@students_api.route('/api/students/add', methods=['POST'])
+@rest_api.route('/api/students/add', methods=['POST'])
 def api_add_student():
     student = request.get_json()
     return jsonify(insert_student(student))
 
-@students_api.route('/api/students/update', methods=['PUT'])
+@rest_api.route('/api/students/update', methods=['PUT'])
 def api_update_student():
     student = request.get_json()
     return jsonify(update_student(student))
 
-@students_api.route('/api/students/delete/<student_id>', methods=['DELETE'])
+@rest_api.route('/api/students/delete/<student_id>', methods=['DELETE'])
 def api_delete_student(student_id):
     return jsonify(delete_student(student_id))
 
-@students_api.route('/api/faculties', methods=['GET'])
+@rest_api.route('/api/faculties', methods=['GET'])
 def api_get_faculties():
     return jsonify(get_faculties())
 
-@students_api.route('/api/faculties/<faculty_id>', methods=['GET'])
+@rest_api.route('/api/faculties/<faculty_id>', methods=['GET'])
 def api_get_faculty(faculty_id):
     return jsonify(get_faculty_by_id(faculty_id))
 
-@students_api.route('/api/faculties/add', methods=['POST'])
+@rest_api.route('/api/faculties/add', methods=['POST'])
 def api_add_faculty():
     faculty = request.get_json()
     return jsonify(insert_faculty(faculty))
 
-@students_api.route('/api/faculties/update', methods=['PUT'])
+@rest_api.route('/api/faculties/update', methods=['PUT'])
 def api_update_faculty():
     faculty = request.get_json()
     return jsonify(update_faculty(faculty))
 
-@students_api.route('/api/faculties/delete/<faculty_id>', methods=['DELETE'])
+@rest_api.route('/api/faculties/delete/<faculty_id>', methods=['DELETE'])
 def api_delete_faculty(faculty_id):
     return jsonify(delete_faculty(faculty_id))
 
-@students_api.route('/api/checkin/<int:student>', methods=['POST'])
+@rest_api.route('/api/schedule', methods=['GET'])
+def api_get_schedule():
+    return jsonify(get_schedule())
+
+@rest_api.route('/api/schedule/<schedule_id>', methods=['GET'])
+def api_get_schedule_by_id(schedule_id):
+    return jsonify(get_schedule_by_id(schedule_id))
+
+@rest_api.route('/api/schedule/add', methods=['POST'])
+def api_add_schedule():
+    schedule = request.get_json()
+    return jsonify(insert_schedule(schedule))
+
+@rest_api.route('/api/schedule/update', methods=['PUT'])
+def api_update_schedule():
+    schedule = request.get_json()
+    return jsonify(update_schedule(schedule))
+
+@rest_api.route('/api/schedule/delete/<schedule_id>', methods=['DELETE'])
+def api_delete_schedule(schedule_id):
+    return jsonify(delete_schedule(schedule_id))
+
+@rest_api.route('/api/checkin/<int:student>', methods=['POST'])
 def api_checkin(student):
     data = request.json
     attendance_date = datetime.now().strftime('%Y-%m-%d')
@@ -284,7 +420,7 @@ def api_checkin(student):
     return jsonify({'message': f'Student {student} checked in successfully'}), 200
 
 
-#@students_api.route('/api/checkin/<int:student_id>', methods=['POST'])
+#@rest_api.route('/api/checkin/<int:student_id>', methods=['POST'])
 #def checkin(student_id):
     conn = connect_to_db()
     cursor = conn.cursor()
@@ -318,7 +454,7 @@ def api_checkin(student):
     conn.close()
     return jsonify({'success': True}), 201
 
-@students_api.route('/api/questions/random', methods=['GET'])
+@rest_api.route('/api/questions/random', methods=['GET'])
 def get_random_question():
     questions = ['Wat is de hoofdstad van Frankrijk?', 'Hoe heet Adriaan zijn compagnon?"', 'Wat is de hoogste berg ter wereld?', 'Wat is de hoofstad van Nederland?']
     question = random.choice(questions)

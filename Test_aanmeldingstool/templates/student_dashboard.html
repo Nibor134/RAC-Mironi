@@ -2,86 +2,48 @@
 
 {% block content %}
 <body>
-  <div class="container mt-8">
-  <h1>Welcome, {{ username }}!</h1>
-	<ul>
-	{% for course in courses %}
-		<li>{{ course.name }}</li>
-	{% endfor %}
-	</ul>
-	<table>
-		<thead>
-			<tr>
-			</tr>
-		</thead>
-		<tbody>
-		{% for attendance in attendances %}
-			<tr>
-				<td>{{ attendance.course_name }}</td>
-				<td>{{ attendance.date }}</td>
-				<td>{{ attendance.status }}</td>
-			</tr>
-		{% endfor %}
-		</tbody>
-	</table>
-</div>
-
-      <div class="container mt-4">
-        <h1>Student Roster</h1>
-        <table class="table">
+  <div class="container mt-5">
+      <h1 class="text-center mb-4">Schedule</h1>
+      <table class="table table-striped">
           <thead>
-            <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Class</th>
-            </tr>
+              <tr>
+                  <th>Course</th>
+                  <th>Faculty</th>
+                  <th>Room</th>
+                  <th>Start Time</th>
+                  <th>End Time</th>
+                  <th>days</th>
+              </tr>
           </thead>
-          <tbody>
-            <tr>
-              <td>1</td>
-              <td>John Smith</td>
-              <td>john.smith@example.com</td>
-              <td>Math</
-
-      <div class="container-expand mt-4">
-        <h1>Class Schedule</h1>
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Time</th>
-              <th>Class</th>
-              <th>Professor</th>
-              <th>Location</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>8:00 AM - 9:30 AM</td>
-              <td>English 101</td>
-              <td>Prof. Johnson</td>
-              <td>Room 101</td>
-            </tr>
-            <tr>
-              <td>9:45 AM - 11:15 AM</td>
-              <td>Math 101</td>
-              <td>Prof. Smith</td>
-              <td>Room 102</td>
-            </tr>
-            <tr>
-              <td>1:00 PM - 2:30 PM</td>
-              <td>History 101</td>
-              <td>Prof. Davis</td>
-              <td>Room 103</td>
-            </tr>
-            <tr>
-              <td>2:45 PM - 4:15 PM</td>
-              <td>Science 101</td>
-              <td>Prof. Brown</td>
-              <td>Lab 201</td>
-            </tr>
+          <tbody id="schedule">
           </tbody>
-        </table>
-      </div>
+      </table>
+  </div>
+
+  <script>
+      $(document).ready(function() {
+          $.ajax({
+              url: '/api/schedule',
+              method: 'GET',
+              success: function(data) {
+                  var schedule = $('#schedule');
+                  schedule.empty();
+                  $.each(data, function(index, schedule_item) {
+                      var row = $('<tr>');
+                      row.append($('<td>').text(schedule_item['course']));
+                      row.append($('<td>').text(schedule_item['faculty']));
+                      row.append($('<td>').text(schedule_item['room']));
+                      row.append($('<td>').text(schedule_item['start_time']));
+                      row.append($('<td>').text(schedule_item['end_time']));
+                      row.append($('<td>').text(schedule_item['days']));
+                      schedule.append(row);
+                  });
+              },
+              error: function() {
+                  alert('Failed to retrieve schedule data');
+              }
+          });
+      });
+  </script>
 </body>
 {% endblock %}

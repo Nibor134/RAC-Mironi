@@ -34,49 +34,54 @@
   </form>
 
   <script>
-    // Show/hide the question and reason fields based on the status selection
-    $('#status').on('change', function() {
-      if ($(this).val() === 'present') {
-        $('#question-container').show();
-        $('#reason-container').hide();
+    // Gets a random question and display it
+    $(document).ready(function() {
+        // Show the question by default
         $.ajax({
           url: '/api/questions/random',
           type: 'GET',
           success: function(data) {
             $('#question-text').text(data.question);
             $('#question').val(data.question);
+            $('#question-container').show();
           }
         });
-      } else {
-        $('#question-container').hide();
-        $('#reason-container').show();
-      }
-    });
-
-    // Submit the form data to the server
-    $('#checkin-form').on('submit', function(event) {
-      event.preventDefault();
-      var data = {
-        'status': $('#status').val(),
-        'question': $('#question').val(),
-        'answer': $('#answer').val(),
-        'reason': $('#reason').val()
-      };
-      var studentNumber = $('#student-number').val();
-      $.ajax({
-        url: '/api/checkin/' + studentNumber,
-        type: 'POST',
-        data: JSON.stringify(data),
-        contentType: 'application/json',
-        success: function(response) {
-          alert(response.message);
-        },
-        error: function(xhr, status, error) {
-          alert('Error checking in: ' + xhr.responseText);
-        }
+      
+        // Hide the question when status is changed to "absent"
+        $('#status').on('change', function() {
+          if ($(this).val() === 'absent') {
+            $('#question-container').hide();
+            $('#reason-container').show();
+          } else {
+            $('#question-container').show();
+            $('#reason-container').hide();
+          }
+        });
+      
+        // Submit the form data to the server
+        $('#checkin-form').on('submit', function(event) {
+          event.preventDefault();
+          var data = {
+            'status': $('#status').val(),
+            'question': $('#question').val(),
+            'answer': $('#answer').val(),
+            'reason': $('#reason').val()
+          };
+          var studentNumber = $('#student-number').val();
+          $.ajax({
+            url: '/api/checkin/' + studentNumber,
+            type: 'POST',
+            data: JSON.stringify(data),
+            contentType: 'application/json',
+            success: function(response) {
+              alert(response.message);
+            },
+            error: function(xhr, status, error) {
+              alert('Error checking in: ' + xhr.responseText);
+            }
+          });
+        });
       });
-    });
-  
   </script>
 </body>
 {% endblock %}
