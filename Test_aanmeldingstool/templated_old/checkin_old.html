@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block content %}
+<head>
+  <title>Student Check-In</title>
+</head>
+<body>
+  <h1>Student Check-In</h1>
+  <form id="checkin-form">
+      <label for="student-number">Student Number:</label>
+      <input type="text" id="student-number" name="student-number"><br>
+      <label for="status">Status:</label>
+      <select id="status" name="status">
+          <option value="present">Present</option>
+          <option value="absent">Absent</option>
+      </select><br>
+      <div id="question-container" style="display:none;">
+          <label for="question">Question:</label>
+          <input type="text" id="question" name="question" readonly><br>
+          <label for="answer">Answer:</label>
+          <input type="text" id="answer" name="answer"><br>
+      </div>
+      <div id="reason-container" style="display:none;">
+          <label for="reason">Reason:</label>
+          <input type="text" id="reason" name="reason"><br>
+      </div>
+      <button type="submit">Submit</button>
+  </form>
+
+  <script>
+      // When the status select box is changed, toggle the visibility of the question or reason fields
+      const statusSelect = document.getElementById('status');
+      const questionContainer = document.getElementById('question-container');
+      const reasonContainer = document.getElementById('reason-container');
+      statusSelect.addEventListener('change', () => {
+          if (statusSelect.value === 'present') {
+              questionContainer.style.display = 'block';
+              reasonContainer.style.display = 'none';
+          } else {
+              questionContainer.style.display = 'none';
+              reasonContainer.style.display = 'block';
+          }
+      });
+
+      // When the form is submitted, send a POST request to the API
+      const form = document.getElementById('checkin-form');
+      form.addEventListener('submit', (event) => {
+          event.preventDefault();
+          const studentNumber = document.getElementById('student-number').value;
+          const status = document.getElementById('status').value;
+          let data = { status };
+          if (status === 'present') {
+              const question = document.getElementById('question').value;
+              const answer = document.getElementById('answer').value;
+              data.question = question;
+              data.answer = answer;
+          } else {
+              const reason = document.getElementById('reason').value;
+              data.reason = reason;
+          }
+          fetch(`/api/checkin/${studentNumber}`, {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(data)
+          })
+          .then(response => {
+              if (response.ok) {
+                  alert('Check-in successful');
+              } else {
+                  alert('Error checking in: ' + response.statusText);
+              }
+          })
+          .catch(error => {
+              alert('Error checking in: ' + error);
+          });
+      });
+  </script>
+</body>
+{% endblock %}

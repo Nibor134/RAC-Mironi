@@ -1,5 +1,6 @@
 import sqlite3
 import random
+from datetime import datetime
 from flask import Flask, request, jsonify, Blueprint
 from flask_cors import CORS
 
@@ -256,8 +257,35 @@ def api_update_faculty():
 def api_delete_faculty(faculty_id):
     return jsonify(delete_faculty(faculty_id))
 
-@students_api.route('/api/checkin/<int:student_id>', methods=['POST'])
-def checkin(student_id):
+@students_api.route('/api/checkin/<int:student>', methods=['POST'])
+def api_checkin(student):
+    data = request.json
+    attendance_date = datetime.now().strftime('%Y-%m-%d')
+    attendance_time = datetime.now().strftime('%H:%M:%S')
+    status = data.get('status')
+    question = data.get('question')
+    answer = data.get('answer')
+    reason = data.get('reason')
+
+    # Check if the student exists in the database
+    conn = connect_to_db()
+    cursor = conn.cursor()
+    student_query = cursor.execute('SELECT * FROM Students WHERE Studentnumber = ?', (student,))
+    student_data = student_query.fetchone()
+    if not student_data:
+        return jsonify({'error': f'Student {student} not found'}), 404
+
+    # Insert attendance record into the database
+    cursor.execute('INSERT INTO Attendance (Student_id, Studentnumber, Attendance_date, Attendance_time, Status, Question, Answer, Reason) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+                   (student_data[0], student_data[5], attendance_date, attendance_time, status, question, answer, reason))
+    conn.commit()
+    conn.close()
+
+    return jsonify({'message': f'Student {student} checked in successfully'}), 200
+
+
+#@students_api.route('/api/checkin/<int:student_id>', methods=['POST'])
+#def checkin(student_id):
     conn = connect_to_db()
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM Students WHERE Student_id = ?', (student_id,))
@@ -292,6 +320,6 @@ def checkin(student_id):
 
 @students_api.route('/api/questions/random', methods=['GET'])
 def get_random_question():
-    questions = ['What is the capital of France?', 'Who wrote "To Kill a Mockingbird?"', 'What is the highest mountain in the world?']
+    questions = ['Wat is de hoofdstad van Frankrijk?', 'Hoe heet Adriaan zijn compagnon?"', 'Wat is de hoogste berg ter wereld?', 'Wat is de hoofstad van Nederland?']
     question = random.choice(questions)
     return jsonify({'question': question})
