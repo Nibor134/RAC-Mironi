@@ -1,39 +1,7 @@
-from flask import Flask, render_template, request, session, redirect, url_for,flash
+from flask import Flask, render_template, request, session, redirect, url_for,flash, Blueprint
 import sqlite3
-from api_routes import students_api
 
 app = Flask(__name__)
-app.register_blueprint(students_api)
-
-app.secret_key = 'your-secret-key'
-
-conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db', check_same_thread=False)
-c = conn.cursor()
-
-@app.route('/')
-def index():
-    return render_template('login_test.html')
-
-# Student dashboard
-@app.route('/student_dashboard')
-def student_dashboard():
-    if 'student_logged_in' in session:
-        student_id = session.get('user_id')
-        return render_template('student_dashboard.html',)
-    elif 'teacher_logged_in' in session:
-        return render_template('student_dashboard.html',)
-    else:
-        flash('Invalid login credentials.', 'danger')
-        return redirect(url_for('login'))
-
-@app.route('/teacher_dashboard')
-def teacher_dashboard():
-    if 'teacher_logged_in' in session:
-        teacher_id = session.get('user_id')
-        return render_template('teacher_dashboard.html',)
-    else:
-        flash('Invalid login credentials.', 'danger')
-        return redirect(url_for('login'))
 
 def get_student_by_studentnumber(studentnumber):
     conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
@@ -68,52 +36,6 @@ def get_admin_by_username(username):
     else:
         return None
 
-
-@app.route('/check_in', methods=['GET', 'POST'])
-def check_in():
-    if 'student_logged_in' in session:
-        return render_template('checkin.html')
-    else:
-        flash('Log alstublieft eerst in', 'danger')
-        return redirect(url_for('login'))
-
-# Route to create new class
-@app.route('/create_class', methods=['GET', 'POST'])
-def create_class():
-    if 'teacher_logged_in' in session:
-        if request.method == 'POST':
-            # Get form data
-            class_name = request.form['class_name']
-            date = request.form['date']
-            time = request.form['time']
-            location = request.form['location']
-            
-            # Insert class details into the database
-            conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
-            c = conn.cursor()
-            c.execute('INSERT INTO clas (class_name, date, time, location) VALUES (?, ?, ?, ?)', (class_name, date, time, location))
-            conn.commit()
-            conn.close()
-            
-            return redirect(url_for('teacher_dashboard'))
-            
-        return render_template('create_class.html')
-    else:
-        flash('Log alstublieft eerst in', 'danger')
-        return redirect(url_for('login'))
-
-@app.route('/view_classes')
-def view_classes():
-    if 'teacher_logged_in' in session:
-        conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
-        c = conn.cursor()
-        c.execute('SELECT * FROM Schedule')
-        classes = c.fetchall()
-        conn.close()
-        return render_template('view_classes2.html', classes=classes)
-    else:
-        flash('Log alstublieft eerst in', 'danger')
-        return redirect(url_for('login'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -194,6 +116,3 @@ def logout():
     flash('You have been logged out.', 'info')
     return redirect(url_for('login'))
 
-if __name__ == '__main__':
-    app.run(debug=True)
-    

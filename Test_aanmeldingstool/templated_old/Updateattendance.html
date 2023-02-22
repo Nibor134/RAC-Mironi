@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="/static/basic.css" type="text/css">
+  </head>
+  <body>
+
+    <div class="slider">
+      <h1>Nicky Aardse</h1>
+        <input type="range" min="0" max="1" step="1" value="0" id="slider" oninput="updateAttendance('Nicky Aardse', this.value)">
+        <p id="status">Niet Aanwezig</p>
+    </div>
+
+    <div class="slider">
+      <h1>Milan Kreukniet</h1>
+        <input type="range" min="0" max="1" step="1" value="0" id="slider2" oninput="updateAttendance('Milan Kreukniet', this.value)">
+        <p id="status2">Niet Aanwezig</p>
+    </div>
+
+    <div class="slider">
+      <h1>Robin Winkels</h1>
+        <input type="range" min="0" max="1" step="1" value="0" id="slider3" oninput="updateAttendance('Robin Winkels', this.value)">
+        <p id="status3">Niet Aanwezig</p>
+    </div>
+    <script>
+      function updateAttendance(name, value) {
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "/update-attendance", true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.send(JSON.stringify({ name, value }));
+
+        const status = document.getElementById(`status-${name.split(" ").join("-")}`);
+        status.innerHTML = value === "0" ? "Niet Aanwezig" : "Aanwezig";
+      }
+    </script>
+  </body>
+</html>

@@ -1,6 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
+<head>
+<script src="https://code.jquery.com/jquery-3.6.3.slim.min.js" integrity="sha256-ZwqZIVdD3iXNyGHbSYdsmWP//UBokj2FHAxKuSBKDSo=" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+</head>
+<body>
   <div class="container mt-4">
     <h1>Welkom, {{ username }}!</h1>
     <h2>Creeër een les:</h2>
@@ -19,8 +25,39 @@
       </div>
       <button type="submit" class="btn btn-primary">Create</button>
     </form>
-    
+  </div>
+    <div>
+      <h1>Student List</h1>
+      <table id="studentTable" class="table table-striped">
+        <thead class="thead-dark">
+          <tr>
+            <th>Student ID</th>
+            <th>Name</th>
+            <th>Other Details</th>
+            <th>Username</th>
+            <th>Password</th>
+            <th>Student Number</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </body>
+    <script>
+      $(document).ready(function() {
+        // Make a GET request to the /api/students endpoint
+        $.get("/api/students", function(data) {
+          // Loop through each student object and create a table row for each one
+          for (var i = 0; i < data.length; i++) {
+            var student = data[i];
+            var row = "<tr><td>" + student.Student_id + "</td><td>" + student.Student_name + "</td><td>" + student.Other_details + "</td><td>" + student.Username + "</td><td>" + student.Password + "</td><td>" + student.Studentnumber + "</td></tr>";
+            $("#studentTable tbody").append(row);
+          }
+        }).fail(function(jqXHR, textStatus, errorThrown) {
+          console.log("Error getting student data: " + textStatus + ", " + errorThrown);
+        });
+      });
+    </script>
   </div>
 </body>
-</html>
 {% endblock %}
