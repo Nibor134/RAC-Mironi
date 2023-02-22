@@ -1,3 +1,5 @@
+# Accesible through Postman 
+
 import sqlite3
 import random
 from datetime import datetime
@@ -39,7 +41,6 @@ def get_students():
         cur.execute("SELECT * FROM Students")
         rows = cur.fetchall()
 
-        # convert row objects to dictionary
         for i in rows:
             student = {}
             student["Student_id"] = i["Student_id"]
@@ -64,7 +65,6 @@ def get_student_by_id(student_id):
                     (student_id,))
         row = cur.fetchone()
 
-        # convert row object to dictionary
         student["Student_id"] = row["Student_id"]
         student["Student_name"] = row["Student_name"]
         student["Other_details"] = row["Other_details"]
@@ -86,7 +86,6 @@ def update_student(student):
                     (student["Student_name"], student["Other_details"], student["Username"], 
                      student["Password"], student["Studentnumber"], student["Student_id"],))
         conn.commit()
-        #return the student
         updated_student = get_student_by_id(student["Student_id"])
     except:
         conn.rollback()
@@ -139,7 +138,6 @@ def get_faculties():
         cur.execute("SELECT * FROM Faculty")
         rows = cur.fetchall()
 
-        # convert row objects to dictionary
         for i in rows:
             faculty = {}
             faculty["Faculty_id"] = i["Faculty_id"]
@@ -164,7 +162,6 @@ def get_faculty_by_id(faculty_id):
                     (faculty_id,))
         row = cur.fetchone()
 
-        # convert row object to dictionary
         faculty["Faculty_id"] = row["Faculty_id"]
         faculty["Faculty_name"] = row["Faculty_name"]
         faculty["Faculty_email"] = row["Faculty_email"]
@@ -186,7 +183,6 @@ def update_faculty(faculty):
                     (faculty["Faculty_name"], faculty["Faculty_email"], faculty["Other_details"], 
                      faculty["Username"], faculty["Password"], faculty["Faculty_id"],))
         conn.commit()
-        #return the faculty
         updated_faculty = get_faculty_by_id(faculty["Faculty_id"])
     except:
         conn.rollback()
@@ -239,7 +235,7 @@ def get_schedule():
         cur.execute("SELECT * FROM Schedule")
         rows = cur.fetchall()
 
-        # convert row objects to dictionary
+        
         for i in rows:
             schedule = {}
             schedule["schedule_id"] = i["schedule_id"]
@@ -265,7 +261,7 @@ def get_schedule_by_id(schedule_id):
                     (schedule_id,))
         row = cur.fetchone()
 
-        # convert row object to dictionary
+        
         schedule["schedule_id"] = row["schedule_id"]
         schedule["course_id"] = row["course_id"]
         schedule["faculty_id"] = row["faculty_id"]
@@ -288,7 +284,7 @@ def update_schedule(schedule):
                     (schedule["Course_id"], schedule["Faculty_id"], schedule["Room_id"], 
                      schedule["Start_time"], schedule["End_time"], schedule["Schedule_id"], schedule["Days"]))
         conn.commit()
-        #return the schedule
+
         updated_schedule = get_schedule_by_id(schedule["Schedule_id"])
     except:
         conn.rollback()
@@ -308,7 +304,6 @@ def update_schedule_by_id(schedule_id, schedule):
                     (schedule["course_id"], schedule["faculty_id"], schedule["room_id"], 
                      schedule["start_time"], schedule["end_time"], schedule["days"], schedule_id))
         conn.commit()
-        #return the schedule
         updated_schedule = get_schedule_by_id(schedule_id)
     except:
         conn.rollback()
@@ -403,12 +398,13 @@ def api_update_by_id_schedule(schedule_id):
     schedule = request.get_json()
     return jsonify(update_schedule_by_id(schedule_id, schedule))
 
-
-
-
 @students_api.route('/api/schedule/delete/<schedule_id>', methods=['DELETE'])
 def api_delete_schedule(schedule_id):
     return jsonify(delete_schedule(schedule_id))
+
+
+
+# Routes used for checkin
 
 @students_api.route('/api/checkin/<int:student>', methods=['POST'])
 def api_checkin(student):
@@ -420,7 +416,7 @@ def api_checkin(student):
     answer = data.get('answer')
     reason = data.get('reason')
 
-    # Check if the student exists in the database
+    
     conn = connect_to_db()
     cursor = conn.cursor()
     student_query = cursor.execute('SELECT * FROM Students WHERE Studentnumber = ?', (student,))
@@ -428,48 +424,13 @@ def api_checkin(student):
     if not student_data:
         return jsonify({'error': f'Student {student} not found'}), 404
 
-    # Insert attendance record into the database
+    
     cursor.execute('INSERT INTO Attendance (Student_id, Studentnumber, Attendance_date, Attendance_time, Status, Question, Answer, Reason) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
                    (student_data[0], student_data[5], attendance_date, attendance_time, status, question, answer, reason))
     conn.commit()
     conn.close()
 
     return jsonify({'message': f'Student {student} checked in successfully'}), 200
-
-
-#@students_api.route('/api/checkin/<int:student_id>', methods=['POST'])
-#def checkin(student_id):
-    conn = connect_to_db()
-    cursor = conn.cursor()
-    cursor.execute('SELECT * FROM Students WHERE Student_id = ?', (student_id,))
-    student = cursor.fetchone()
-    if not student:
-        return jsonify({'error': 'Student not found'}), 404
-
-    # Get check-in status
-    status = request.json.get('status')
-    if not status:
-        return jsonify({'error': 'Check-in status not provided'}), 400
-
-    # Get answer to question (if present)
-    answer = request.json.get('answer')
-    if status == 'present' and not answer:
-        return jsonify({'error': 'Question answer not provided'}), 400
-
-    # Insert check-in record into database
-    if status == 'present':
-        question = get_random_question()
-        cursor.execute('INSERT INTO Attendance (Enrollment_id, Studentnumber, Attendance_date, Attendance_time, Status, Question, Answer) VALUES (?, ?, ?, ?, ?, ?, ?)', 
-                       (student_id, student['Studentnumber'], 'today', 'now', 'Present', question, answer))
-    else:
-        reason = request.json.get('reason')
-        if not reason:
-            return jsonify({'error': 'Reason for absence not provided'}), 400
-        cursor.execute('INSERT INTO Attendance (Enrollment_id, Studentnumber, Attendance_date, Attendance_time, Status, Reason) VALUES (?, ?, ?, ?, ?, ?)', 
-                       (student_id, student['Studentnumber'], 'today', 'now', 'Absent', reason))
-    conn.commit()
-    conn.close()
-    return jsonify({'success': True}), 201
 
 @students_api.route('/api/questions/random', methods=['GET'])
 def get_random_question():

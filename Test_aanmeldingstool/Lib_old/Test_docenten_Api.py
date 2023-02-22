@@ -62,10 +62,10 @@ def get_docent_by_id(docent_id):
 
         # convert row object to dictionary
         docent["Docent_id"] = row["Docent_id"]
-        #docent["Voornaam"] = row["Voornaam"]
-        #docent["Achternaam"] = row["Achternaam"]
-        #docent["Email"] = row["Email"]
-        #docent["Telefoonnummer"] = row["Telefoonnummer"]
+        docent["Voornaam"] = row["Voornaam"]
+        docent["Achternaam"] = row["Achternaam"]
+        docent["Email"] = row["Email"]
+        docent["Telefoonnummer"] = row["Telefoonnummer"]
     except:
         docent = {}
 

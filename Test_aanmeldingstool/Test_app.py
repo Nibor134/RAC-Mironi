@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, session, redirect, url_for,flash
 import sqlite3
-from api_routes import students_api
+from lib.api_routes import students_api
 
 app = Flask(__name__)
 app.register_blueprint(students_api)
