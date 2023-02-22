@@ -1,9 +1,9 @@
 from flask import Flask, render_template, request, session, redirect, url_for,flash
 import sqlite3
-from api_routes import rest_api
+from api_routes import students_api
 
 app = Flask(__name__)
-app.register_blueprint(rest_api)
+app.register_blueprint(students_api)
 
 app.secret_key = 'your-secret-key'
 

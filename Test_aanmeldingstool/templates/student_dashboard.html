@@ -1,18 +1,22 @@
 {% extends "base2.html" %}
 
 {% block content %}
+<head>
+    <title>Rooster</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  </head>
 <body>
   <div class="container mt-5">
-      <h1 class="text-center mb-4">Schedule</h1>
+      <h1 class="text-center mb-4">Rooster</h1>
       <table class="table table-striped">
           <thead>
               <tr>
-                  <th>Course</th>
-                  <th>Faculty</th>
-                  <th>Room</th>
-                  <th>Start Time</th>
-                  <th>End Time</th>
-                  <th>days</th>
+                  <th>Vak</th>
+                  <th>Faculteit</th>
+                  <th>Lokaal</th>
+                  <th>Start Tijd</th>
+                  <th>Eind Tijd</th>
+                  <th>Dag</th>
               </tr>
           </thead>
           <tbody id="schedule">
@@ -21,29 +25,29 @@
   </div>
 
   <script>
-      $(document).ready(function() {
-          $.ajax({
-              url: '/api/schedule',
-              method: 'GET',
-              success: function(data) {
-                  var schedule = $('#schedule');
-                  schedule.empty();
-                  $.each(data, function(index, schedule_item) {
-                      var row = $('<tr>');
-                      row.append($('<td>').text(schedule_item['course']));
-                      row.append($('<td>').text(schedule_item['faculty']));
-                      row.append($('<td>').text(schedule_item['room']));
-                      row.append($('<td>').text(schedule_item['start_time']));
-                      row.append($('<td>').text(schedule_item['end_time']));
-                      row.append($('<td>').text(schedule_item['days']));
-                      schedule.append(row);
-                  });
-              },
-              error: function() {
-                  alert('Failed to retrieve schedule data');
-              }
-          });
-      });
-  </script>
+    $(document).ready(function() {
+        $.ajax({
+            url: '/api/schedule',
+            method: 'GET',
+            success: function(data) {
+                var schedule = $('#schedule');
+                schedule.empty();
+                $.each(data, function(index, schedule_item) {
+                    var row = $('<tr>');
+                    row.append($('<td>').text(schedule_item['course_id']));
+                    row.append($('<td>').text(schedule_item['faculty_id']));
+                    row.append($('<td>').text(schedule_item['room_id']));
+                    row.append($('<td>').text(schedule_item['start_time']));
+                    row.append($('<td>').text(schedule_item['end_time']));
+                    row.append($('<td>').text(schedule_item['days']));
+                    schedule.append(row);
+                });
+            },
+            error: function() {
+                alert('Failed to retrieve schedule data');
+            }
+        });
+    });
+</script>
 </body>
 {% endblock %}
