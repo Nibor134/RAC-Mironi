@@ -1,11 +1,11 @@
 import sqlite3
+import random
 from flask import Flask, request, jsonify, Blueprint
 from flask_cors import CORS
 
-
 students_api = Blueprint('students_api', __name__)
 CORS(students_api, resources={r"/*": {"origins": "*"}})
-    
+
     
 def connect_to_db():
     conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
@@ -255,3 +255,43 @@ def api_update_faculty():
 @students_api.route('/api/faculties/delete/<faculty_id>', methods=['DELETE'])
 def api_delete_faculty(faculty_id):
     return jsonify(delete_faculty(faculty_id))
+
+@students_api.route('/api/checkin/<int:student_id>', methods=['POST'])
+def checkin(student_id):
+    conn = connect_to_db()
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM Students WHERE Student_id = ?', (student_id,))
+    student = cursor.fetchone()
+    if not student:
+        return jsonify({'error': 'Student not found'}), 404
+
+    # Get check-in status
+    status = request.json.get('status')
+    if not status:
+        return jsonify({'error': 'Check-in status not provided'}), 400
+
+    # Get answer to question (if present)
+    answer = request.json.get('answer')
+    if status == 'present' and not answer:
+        return jsonify({'error': 'Question answer not provided'}), 400
+
+    # Insert check-in record into database
+    if status == 'present':
+        question = get_random_question()
+        cursor.execute('INSERT INTO Attendance (Enrollment_id, Studentnumber, Attendance_date, Attendance_time, Status, Question, Answer) VALUES (?, ?, ?, ?, ?, ?, ?)', 
+                       (student_id, student['Studentnumber'], 'today', 'now', 'Present', question, answer))
+    else:
+        reason = request.json.get('reason')
+        if not reason:
+            return jsonify({'error': 'Reason for absence not provided'}), 400
+        cursor.execute('INSERT INTO Attendance (Enrollment_id, Studentnumber, Attendance_date, Attendance_time, Status, Reason) VALUES (?, ?, ?, ?, ?, ?)', 
+                       (student_id, student['Studentnumber'], 'today', 'now', 'Absent', reason))
+    conn.commit()
+    conn.close()
+    return jsonify({'success': True}), 201
+
+@students_api.route('/api/questions/random', methods=['GET'])
+def get_random_question():
+    questions = ['What is the capital of France?', 'Who wrote "To Kill a Mockingbird?"', 'What is the highest mountain in the world?']
+    question = random.choice(questions)
+    return jsonify({'question': question})
