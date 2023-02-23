@@ -8,7 +8,7 @@
   <div class="container mt-4">
     <h1>Welkom, {{ username }}!</h1>
     <h2>Creeër een les:</h2>
-    <form method="POST" action="{{ url_for('create_class') }}">
+    <form method="POST" action="{{ url_for('teacher.create_class') }}">
       <div class="form-group">
         <label for="class_name">Lesnaam:</label>
         <input type="text" class="form-control" id="class_name" name="class_name">
