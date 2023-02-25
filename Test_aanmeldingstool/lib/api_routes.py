@@ -437,3 +437,29 @@ def get_random_question():
     questions = ['Wat is de hoofdstad van Frankrijk?', 'Hoe heet Adriaan zijn compagnon?"', 'Wat is de hoogste berg ter wereld?', 'Wat is de hoofstad van Nederland?']
     question = random.choice(questions)
     return jsonify({'question': question})
+
+
+@students_api.route('/api/attendance', methods=['GET'])
+def get_attendance():
+    conn = connect_to_db()
+    cursor = conn.cursor()
+
+    # Retrieve attendance records from the database
+    cursor.execute('SELECT Students.student_name, Students.studentnumber, Attendance.Attendance_date, Attendance.Attendance_time, Attendance.Status FROM Students INNER JOIN Attendance ON Students.Student_id=Attendance.Student_id')
+    rows = cursor.fetchall()
+
+    # Convert the records into a list of dictionaries
+    attendance = []
+    for row in rows:
+        attendance.append({
+            'studen_name': row[0],
+            'studentnumber': row[1],
+            'date': row[2],
+            'time': row[3],
+            'status': row[4]
+        })
+
+    conn.close()
+
+    # Return the attendance records as a JSON response
+    return jsonify({'attendance': attendance})

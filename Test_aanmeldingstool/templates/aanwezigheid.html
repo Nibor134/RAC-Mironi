@@ -1,0 +1,50 @@
+{% extends "base2.html" %}
+
+{% block content %}
+<head>
+  <title>Aanwezigheid</title>
+  <script src="https://code.jquery.com/jquery-3.6.2.min.js"></script>
+</head>
+<body>
+  <h1>Aanwezigheid</h1>
+  <div id="attendance-table">
+    <table class="table" id="attendance-table">
+        <thead>
+          <tr>
+            <th>Datum</th>
+            <th>Tijd</th>
+            <th>Naam</th>
+            <th>Studentnummer</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+  </div>
+
+  <script>
+    function getAttendance() {
+      $.get("/api/attendance", function(data) {
+        var attendance = data.attendance;
+        var tableBody = $('#attendance-table > tbody');
+        tableBody.empty();
+        attendance.forEach(function(item) {
+          var row = $('<tr></tr>');
+          row.append($('<td></td>').text(item.date));
+          row.append($('<td></td>').text(item.time));
+          row.append($('<td></td>').text(item.studen_name));
+          row.append($('<td></td>').text(item.studentnumber));
+          row.append($('<td></td>').text(item.status));
+          tableBody.append(row);
+        });
+      });
+    }
+
+    $(document).ready(function() {
+      getAttendance();
+      setInterval(getAttendance, 5000);
+    });
+  </script>
+</body>
+{% endblock %}
