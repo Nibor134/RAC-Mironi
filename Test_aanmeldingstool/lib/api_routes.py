@@ -69,7 +69,7 @@ def get_student_by_id(student_id):
         student["Student_id"] = row["Student_id"]
         student["Student_name"] = row["Student_name"]
         student["Other_details"] = row["Other_details"]
-        student["Class_id"] = i["Class_id"]
+        student["Class_id"] = row["Class_id"]
         student["Username"] = row["Username"]
         student["Password"] = row["Password"]
         student["Studentnumber"] = row["Studentnumber"]
@@ -458,5 +458,5 @@ def get_attendance():
             'class_id': row[5]
         })
     conn.close()
-    
+
     return jsonify({'attendance': attendance})
