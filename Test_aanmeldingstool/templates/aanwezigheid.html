@@ -16,6 +16,7 @@
             <th>Naam</th>
             <th>Studentnummer</th>
             <th>Status</th>
+            <th>Klas</th>
           </tr>
         </thead>
         <tbody>
@@ -33,9 +34,10 @@
           var row = $('<tr></tr>');
           row.append($('<td></td>').text(item.date));
           row.append($('<td></td>').text(item.time));
-          row.append($('<td></td>').text(item.studen_name));
+          row.append($('<td></td>').text(item.student_name));
           row.append($('<td></td>').text(item.studentnumber));
           row.append($('<td></td>').text(item.status));
+          row.append($('<td></td>').text(item.class_id));
           tableBody.append(row);
         });
       });
