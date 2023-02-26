@@ -25,7 +25,7 @@ def student_dashboard():
         student_id = session.get('user_id')
         return render_template('student_dashboard.html',)
     else:
-        flash('Invalid login credentials.', 'danger')
+        flash('Ongeldige inloggegevens.', 'danger')
         return redirect(url_for('login'))
 
 @app.route('/teacher_dashboard')
@@ -34,7 +34,7 @@ def teacher_dashboard():
         teacher_id = session.get('user_id')
         return render_template('teacher_dashboard.html',)
     else:
-        flash('Invalid login credentials.', 'danger')
+        flash('Ongeldige inloggegevens.', 'danger')
         return redirect(url_for('login'))
 
 def get_student_by_studentnumber(studentnumber):
@@ -87,7 +87,7 @@ def login():
                 flash('You were successfully logged in!', 'success')
                 return redirect(url_for('student_dashboard'))
             else:
-                flash('Invalid login credentials.', 'danger')
+                flash('Ongeldige inloggegevens.', 'danger')
                 return redirect(url_for('login'))
 
         elif role == 'teacher':
@@ -100,7 +100,7 @@ def login():
                 flash('You were successfully logged in!', 'success')
                 return redirect(url_for('teacher_dashboard'))
             else:
-                flash('Invalid login credentials.', 'danger')
+                flash('Ongeldige inloggegevens.', 'danger')
                 return redirect(url_for('login'))
 
         elif role == 'admin':
@@ -113,7 +113,7 @@ def login():
                 flash('You were successfully logged in!', 'success')
                 return redirect(url_for('admin_dashboard'))
             else:
-                flash('Invalid login credentials.', 'danger')
+                flash('Ongeldige inloggegevens.', 'danger')
                 return redirect(url_for('login'))
     
     return render_template('login_test.html')
