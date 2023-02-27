@@ -12,3 +12,4 @@ def check_in():
     else:
         flash('Log alstublieft eerst in', 'danger')
         return redirect(url_for('login'))
+    

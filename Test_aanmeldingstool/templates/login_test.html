@@ -18,7 +18,7 @@
             <a class="logo" href="https://www.hogeschoolrotterdam.nl/"><img src="static/images/logo.svg" name="HomeButton" action="/main"></a>
         </div>
     </div>
-    <div class="container">
+    <div class="containe-sm">
         <div class="row">
             <div class="d-flex justify-content-center">
                 <form method="POST" action="{{ url_for('login') }}">
@@ -46,7 +46,17 @@
                             <option value="teacher">Docent</option>
                             <option value="admin">Administrator</option>
                         </select></div>
-
+                        <div class="input_text">
+                            {% with messages = get_flashed_messages(with_categories=true) %}
+                                {% if messages %}
+                                    {% for category, message in messages %}
+                                    <div class="alert alert-{{ category }}">
+                                        {{ message }}
+                                    </div>
+                                    {% endfor %}
+                                {% endif %}
+                            {% endwith %}
+                        </div>
                         <div class="login_button">
                             <input value="Inloggen" name="LoginButton" type="submit">
                         </div>

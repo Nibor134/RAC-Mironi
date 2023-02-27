@@ -41,3 +41,11 @@ def view_classes():
     else:
         flash('Log alstublieft eerst in', 'danger')
         return redirect(url_for('login'))
+
+@teacher.route('/aanwezigheid', methods=['GET', 'POST'])
+def attendance():
+    if 'teacher_logged_in' in session:
+        return render_template('aanwezigheid.html')
+    else:
+        flash('Log alstublieft eerst in', 'danger')
+        return redirect(url_for('login'))

@@ -3,7 +3,7 @@
 import sqlite3
 import random
 from datetime import datetime
-from flask import Flask, request, jsonify, Blueprint
+from flask import Flask, request, jsonify, Blueprint, session
 from flask_cors import CORS
 
 students_api = Blueprint('students_api', __name__)
@@ -46,6 +46,7 @@ def get_students():
             student["Student_id"] = i["Student_id"]
             student["Student_name"] = i["Student_name"]
             student["Other_details"] = i["Other_details"]
+            student["Class_id"] = i["Class_id"]
             student["Username"] = i["Username"]
             student["Password"] = i["Password"]
             student["Studentnumber"] = i["Studentnumber"]
@@ -68,6 +69,7 @@ def get_student_by_id(student_id):
         student["Student_id"] = row["Student_id"]
         student["Student_name"] = row["Student_name"]
         student["Other_details"] = row["Other_details"]
+        student["Class_id"] = row["Class_id"]
         student["Username"] = row["Username"]
         student["Password"] = row["Password"]
         student["Studentnumber"] = row["Studentnumber"]
@@ -81,9 +83,9 @@ def update_student(student):
     try:
         conn = connect_to_db()
         cur = conn.cursor()
-        cur.execute('''UPDATE Students SET Student_name = ?, Other_details = ?, Username = ?, Password = ?, Studentnumber = ?
+        cur.execute('''UPDATE Students SET Student_name = ?, Other_details = ?, Class_id = ?,Username = ?, Password = ?, Studentnumber = ?
                        WHERE Student_id = ?''',
-                    (student["Student_name"], student["Other_details"], student["Username"], 
+                    (student["Student_name"], student["Other_details"], student["Class_id"], student["Username"], 
                      student["Password"], student["Studentnumber"], student["Student_id"],))
         conn.commit()
         updated_student = get_student_by_id(student["Student_id"])
@@ -402,10 +404,6 @@ def api_update_by_id_schedule(schedule_id):
 def api_delete_schedule(schedule_id):
     return jsonify(delete_schedule(schedule_id))
 
-
-
-# Routes used for checkin
-
 @students_api.route('/api/checkin/<int:student>', methods=['POST'])
 def api_checkin(student):
     data = request.json
@@ -426,7 +424,7 @@ def api_checkin(student):
 
     
     cursor.execute('INSERT INTO Attendance (Student_id, Studentnumber, Attendance_date, Attendance_time, Status, Question, Answer, Reason) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-                   (student_data[0], student_data[5], attendance_date, attendance_time, status, question, answer, reason))
+                (student_data[0], student_data[5], attendance_date, attendance_time, status, question, answer, reason))
     conn.commit()
     conn.close()
 
@@ -437,3 +435,28 @@ def get_random_question():
     questions = ['Wat is de hoofdstad van Frankrijk?', 'Hoe heet Adriaan zijn compagnon?"', 'Wat is de hoogste berg ter wereld?', 'Wat is de hoofstad van Nederland?']
     question = random.choice(questions)
     return jsonify({'question': question})
+
+
+@students_api.route('/api/attendance', methods=['GET'])
+def get_attendance():
+    conn = connect_to_db()
+    cursor = conn.cursor()
+
+    # Retrieve attendance records from the database
+    cursor.execute('SELECT Students.student_name, Students.studentnumber, Attendance.Attendance_date, Attendance.Attendance_time, Attendance.Status, Students.Class_id FROM Students INNER JOIN Attendance ON Students.Student_id=Attendance.Student_id')
+    rows = cursor.fetchall()
+
+    # Convert the records into a list of dictionaries
+    attendance = []
+    for row in rows:
+        attendance.append({
+            'student_name': row[0],
+            'studentnumber': row[1],
+            'date': row[2],
+            'time': row[3],
+            'status': row[4],
+            'class_id': row[5]
+        })
+    conn.close()
+
+    return jsonify({'attendance': attendance})
