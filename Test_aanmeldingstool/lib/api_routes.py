@@ -460,3 +460,50 @@ def get_attendance():
     conn.close()
 
     return jsonify({'attendance': attendance})
+
+@students_api.route('/api/create_meeting', methods=['POST'])
+def create_meeting():
+    # Parse the request data
+    data = request.json
+    meeting_title = data.get('title')
+    meeting_date = data.get('date')
+    meeting_time = data.get('time')
+    meeting_duration = data.get('duration')
+    meeting_location = data.get('location')
+    meeting_description = data.get('description')
+    created_by = data.get('created_by')
+    created_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+    # Connect to the database
+    conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
+    c = conn.cursor()
+
+    # Add the new meeting to the database
+    c.execute('INSERT INTO Meeting (Meeting_title, Meeting_date, Meeting_time, Meeting_duration, Meeting_location, Meeting_description) VALUES (?, ?, ?, ?, ?, ?)', 
+                    (meeting_title, meeting_date, meeting_time, meeting_duration, meeting_location, meeting_description))
+
+    # Retrieve the ID of the newly created meeting
+    meeting_id = c.lastrowid
+
+    # Commit the changes and close the database connection
+    conn.commit()
+    conn.close()
+
+    # Return the meeting ID in the response
+    return jsonify({'message': 'Meeting created successfully.', 'meeting_id': meeting_id})
+
+@students_api.route('/api/meetings/<int:meeting_id>', methods=['DELETE'])
+def delete_meeting(meeting_id):
+    # Connect to the database
+    conn = connect_to_db()
+    cursor = conn.cursor()
+
+    # Delete the meeting with the given meeting_id
+    cursor.execute('DELETE FROM Meeting WHERE Meeting_id = ?', (meeting_id,))
+
+    # Commit the changes and close the database connection
+    conn.commit()
+    conn.close()
+
+    # Return a success message
+    return jsonify({'message': f'Meeting with id {meeting_id} deleted successfully.'})

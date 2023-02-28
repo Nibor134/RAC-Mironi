@@ -1,13 +1,20 @@
 import sqlite3
 import os.path
 
-conn = sqlite3.connect('Test_aanmeldingstool/databases/test_database.db') 
+conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db') 
 c = conn.cursor()
 
-c.execute('''
-          INSERT INTO Docenten (docent_id, docent_voornaam, docent_achternaam, docent_wachtwoord)
+c.execute('''CREATE TABLE Meeting
+                    (Meeting_id INTEGER PRIMARY KEY,
+                    Meeting_title TEXT,
+                    Meeting_date DATE,
+                    Meeting_time TIME,
+                    Meeting_duration INTEGER,
+                    Meeting_location TEXT,
+                    Meeting_description TEXT,
+                    Created_by TEXT,
+                    Created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    Updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
 
-          VALUES
-          (1, 'Jan', 'Korter', 'test1')
-          ''')
 conn.commit()
+conn.close()

@@ -1,6 +1,7 @@
-# Route to create new class
+
 from flask import Flask, request, jsonify, Blueprint, session, redirect, render_template, url_for, flash
 from flask_cors import CORS
+import datetime
 import sqlite3
 
 teacher = Blueprint('teacher', __name__)
@@ -49,3 +50,24 @@ def attendance():
     else:
         flash('Log alstublieft eerst in', 'danger')
         return redirect(url_for('login'))
+
+@teacher.route('/meetings/<int:meeting_id>')
+def meeting(meeting_id):
+    # Connect to the database
+    conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
+    c = conn.cursor()
+
+    # Retrieve the meeting with the requested ID from the database
+    c.execute('SELECT * FROM Meeting WHERE Meeting_id = ?', (meeting_id,))
+    meeting = c.fetchone()
+
+    # Close the database connection
+    conn.close()
+
+    # Render the meeting template with the meeting data
+    return render_template('meetings.html', meeting=meeting)
+
+
+@teacher.route('/create_meeting')
+def make_meeting():
+    return render_template('create_meeting.html')

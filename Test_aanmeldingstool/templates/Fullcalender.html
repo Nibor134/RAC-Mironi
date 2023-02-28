@@ -1,0 +1,32 @@
+{% extends "base2.html" %}
+
+{% block content %}
+  <head>
+    <script type='module'>
+        import dayGridPlugin from '@fullcalendar/daygrid'
+        import iCalendarPlugin from '@fullcalendar/icalendar'
+        
+        var calendar = new Calendar(calendarEl, {
+
+            eventSources: [
+          
+              // your event source
+              {
+                url: 'https://roosterapi.hr.nl/timetables/personalized/0909114', // use the `url` property
+                color: 'yellow',    // an option!
+                textColor: 'black'  // an option!
+              }
+          
+              // any other sources...
+          
+            ]
+          
+          });
+        
+        calendar.render()
+    </script>
+  </head>
+  <body>
+    <div class="container mt-4" id='calendar'></div>
+  </body>
+{% endblock %}
