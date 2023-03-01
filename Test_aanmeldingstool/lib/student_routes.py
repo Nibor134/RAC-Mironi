@@ -42,7 +42,7 @@ def rooster():
     # Geef de verwerkte ics gegevens door aan de template
     return render_template('rooster.html', events=events)
 
-@student_route.route('student/upcoming_meetings')
+@student_route.route('/student/upcoming_meetings')
 def s_upcoming_meetings():
     return render_template('student_upcoming_meetings.html')
 

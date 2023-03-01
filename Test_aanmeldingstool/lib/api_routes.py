@@ -2,13 +2,15 @@
 
 import sqlite3
 import random
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask import Flask, request, jsonify, Blueprint, session
 from flask_cors import CORS
+import pytz
 
 students_api = Blueprint('students_api', __name__)
 CORS(students_api, resources={r"/*": {"origins": "*"}})
 
+amsterdam_tz = pytz.timezone('Europe/Amsterdam')
     
 def connect_to_db():
     conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
@@ -423,11 +425,31 @@ def api_checkin(student, meeting):
         return jsonify({'error': f'Student {student} not found'}), 404
 
     # Check if the meeting exists
-    meeting_query = c.execute('SELECT * FROM Meeting WHERE Meeting_id = ?', (meeting,))
+    #meeting_query = c.execute('SELECT * FROM Meeting WHERE Meeting_id = ? AND Meeting_date = ? AND Meeting_time BETWEEN ? AND ?',
+                    #(meeting, attendance_date, (datetime.now() - timedelta(minutes=10)).strftime('%H:%M'), datetime.now().strftime('%H:%M')))
+    #meeting_data = meeting_query.fetchone()
+    #print(datetime.now)
+    #if not meeting_data:
+        #conn.close()
+        #return jsonify({'error': f'Meeting {meeting} not found'}), 404
+    # Check if the meeting exists
+
+    meeting_query = c.execute('SELECT * FROM Meeting WHERE Meeting_id = ? AND Meeting_date = ?', (meeting, attendance_date,))
     meeting_data = meeting_query.fetchone()
+
     if not meeting_data:
         conn.close()
         return jsonify({'error': f'Meeting {meeting} not found'}), 404
+
+    meeting_time = meeting_data[3] # Extract the meeting time from the database
+    print(meeting_time)
+    current_time = datetime.now(amsterdam_tz).strftime('%H:%M')
+
+    # Check if the current time is between 10 minutes before and 20 minutes after the meeting time
+    if not (datetime.strptime(current_time, '%H:%M') >= datetime.strptime(meeting_time, '%H:%M') - timedelta(minutes=10)
+            and datetime.strptime(current_time, '%H:%M') <= datetime.strptime(meeting_time, '%H:%M') + timedelta(minutes=20)):
+        conn.close()
+        return jsonify({'error': f'Check-in is not available for meeting {meeting} at this time'}), 403
 
     # Add the attendance record
     c.execute('INSERT INTO Attendance (Student_id, Studentnumber, Meeting_id, Attendance_date, Attendance_time, Status, Question, Answer, Reason) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
@@ -579,3 +601,35 @@ def get_upcoming_meetings():
     # Return the meetings in the response
     return jsonify({'upcoming_meetings': meetings})
 
+
+
+def get_meetings():
+    meetings = []
+    try:
+        conn = connect_to_db()
+        conn.row_factory = sqlite3.Row
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM Meeting")
+        rows = cur.fetchall()
+
+        for i in rows:
+            meeting = {}
+            meeting["Meeting_id"] = i["Meeting_id"]
+            meeting["Meeting_title"] = i["Meeting_title"]
+            meeting["Meeting_date"] = i["Meeting_date"]
+            meeting["Meeting_time"] = i["Meeting_time"]
+            meeting["Meeting_duration"] = i["Meeting_duration"]
+            meeting["Meeting_location"] = i["Meeting_location"]
+            meeting["Meeting_description"] = i["Meeting_description"]
+            meeting["Created_by"] = i["Created_by"]
+            meeting["Created_at"] = i["Created_at"]
+            meeting["Updated_at"] = i["Updated_at"]
+            meetings.append(meeting)
+    except:
+        meetings = []
+
+    return meetings
+
+@students_api.route('/api/getmeetings', methods=['GET'])
+def api_getmeetings():
+    return jsonify(get_meetings())
