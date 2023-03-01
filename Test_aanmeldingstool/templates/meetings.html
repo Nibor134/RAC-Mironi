@@ -1,20 +1,46 @@
 {% extends 'base3.html' %}
 
 {% block content %}
+<head>
+  <title>Meeting</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.js"></script>
+</head>
   <h1 class="mb-4">Meeting Details</h1>
-  <div class="card mb-4">
-    <div class="card-header">
-      Meeting ID: {{ meeting[0] }}
+  <div class="row">
+    <div class="col">
+      <div class="card mb-4">
+        <div class="card-header">
+          Meeting ID: {{ meeting[0] }}
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">{{ meeting[1] }}</h5>
+          <p class="card-text">Locatie: {{ meeting[5] }}</p>
+          <p class="card-text">Datum: {{ meeting[2] }}</p>
+          <p class="card-text">Tijd: {{ meeting[3] }}</p>
+          <p class="card-text">Duur (minuten): {{ meeting[4] }}</p>
+          <p class="card-text">{{ meeting[6] }}</p>
+          <p class="card-text">Gemaakt door: {{ meeting[7] }}</p>
+          <a href="/teacher_dashboard" class="btn btn-primary">Terug naar startpagina</a>
+        </div>
+      </div>
     </div>
-    <div class="card-body">
-      <h5 class="card-title">{{ meeting[1] }}</h5>
-      <p class="card-text">Locatie: {{ meeting[5] }}</p>
-      <p class="card-text">Datum: {{ meeting[2] }}</p>
-      <p class="card-text">Tijd: {{ meeting[3] }}</p>
-      <p class="card-text">Duur (minuten): {{ meeting[4] }}</p>
-      <p class="card-text">{{ meeting[6] }}</p>
-      <p class="card-text">Gemaakt door: {{ meeting[7] }}</p>
-      <a href="/teacher_dashboard" class="btn btn-primary">Terug naar startpagina</a>
+    <div class="col">
+      <div class="card mb-4">
+        <div class="card-body d-flex justify-content-center" id="qrcode"></div>
+      </div>
+      </div>
     </div>
   </div>
+
+  <script>
+    var qrcode = new QRCode(document.getElementById("qrcode"), {
+        text: "http://192.168.178.73:5000/check_in",
+        width: 256,
+        height: 256,
+        colorDark : "#000000",
+        colorLight : "#ffffff",
+        correctLevel : QRCode.CorrectLevel.H
+    });
+  </script>
+    
 {% endblock %}

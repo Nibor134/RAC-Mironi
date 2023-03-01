@@ -13,6 +13,12 @@ app.secret_key = 'your-secret-key'
 
 conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db', check_same_thread=False)
 c = conn.cursor()
+# Flask Settings
+
+LISTEN_ALL = "0.0.0.0"
+FLASK_IP = LISTEN_ALL
+FLASK_PORT = 80
+FLASK_DEBUG = True
 
 @app.route('/')
 def index():
@@ -69,6 +75,27 @@ def get_admin_by_username(username):
         return {'username': admin[0], 'password': admin[1]}
     else:
         return None
+
+@app.route('/login_redirect', methods=['GET', 'POST'])
+def login_for_redirect():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        role = request.form['role']
+        
+        if role == 'student':
+            # Validate student login
+            student = get_student_by_studentnumber(username)
+            if student and student['password'] == password:
+                session.clear()
+                session['student_logged_in'] = True
+                session['username'] = student['studentnumber']
+                flash('You were successfully logged in!', 'success')
+                return redirect(url_for('student_route.check_in'))
+            else:
+                flash('Ongeldige inloggegevens.', 'danger')
+                return redirect(url_for('login'))
+    return render_template('login_test.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -149,6 +176,5 @@ def logout():
     flash('You have been logged out.', 'info')
     return redirect(url_for('login'))
 
-if __name__ == '__main__':
-    app.run(debug=True)
-    
+if __name__ == "__main__":
+    app.run(host= '192.168.178.73', debug=FLASK_DEBUG)

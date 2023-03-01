@@ -53,6 +53,7 @@ def attendance():
 
 @teacher.route('/meetings/<int:meeting_id>')
 def meeting(meeting_id):
+    
     # Connect to the database
     conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
     c = conn.cursor()
@@ -70,6 +71,7 @@ def meeting(meeting_id):
 
 @teacher.route('/create_meeting')
 def make_meeting():
+    
     return render_template('create_meeting.html')
 
 @teacher.route('/teacher/upcoming_meetings')

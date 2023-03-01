@@ -14,7 +14,7 @@ def check_in():
         return render_template('checkin2.html')
     else:
         flash('Log alstublieft eerst in', 'danger')
-        return redirect(url_for('login'))
+        return redirect(url_for('login_for_redirect'))
     
 @student_route.route('/rooster')
 def rooster():

@@ -432,7 +432,6 @@ def api_checkin(student, meeting):
         return jsonify({'error': f'Meeting {meeting} not found'}), 404
 
     meeting_time = meeting_data[3] # Extract the meeting time from the database
-    print(meeting_query)
     current_time = datetime.now(amsterdam_tz).strftime('%H:%M')
 
     # Check if the current time is between 10 minutes before and 20 minutes after the meeting time
@@ -528,34 +527,36 @@ def delete_attendance(attendance_id):
 
 @students_api.route('/api/create_meeting', methods=['POST'])
 def create_meeting():
-    # Parse the request data
-    data = request.json
-    meeting_title = data.get('title')
-    meeting_date = data.get('date')
-    meeting_time = data.get('time')
-    meeting_duration = data.get('duration')
-    meeting_location = data.get('location')
-    meeting_description = data.get('description')
-    created_by = data.get('created_by')
-    created_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    if 'teacher_logged_in' in session:
+        print(session)
+        # Parse the request data
+        data = request.json
+        meeting_title = data.get('title')
+        meeting_date = data.get('date')
+        meeting_time = data.get('time')
+        meeting_duration = data.get('duration')
+        meeting_location = data.get('location')
+        meeting_description = data.get('description')
+        created_by = data.get('created_by')
+        created_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-    # Connect to the database
-    conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
-    c = conn.cursor()
+        # Connect to the database
+        conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
+        c = conn.cursor()
 
-    # Add the new meeting to the database
-    c.execute('INSERT INTO Meeting (Meeting_title, Meeting_date, Meeting_time, Meeting_duration, Meeting_location, Meeting_description) VALUES (?, ?, ?, ?, ?, ?)', 
-                    (meeting_title, meeting_date, meeting_time, meeting_duration, meeting_location, meeting_description))
+        # Add the new meeting to the database
+        c.execute('INSERT INTO Meeting (Meeting_title, Meeting_date, Meeting_time, Meeting_duration, Meeting_location, Meeting_description) VALUES (?, ?, ?, ?, ?, ?)', 
+                        (meeting_title, meeting_date, meeting_time, meeting_duration, meeting_location, meeting_description))
 
-    # Retrieve the ID of the newly created meeting
-    meeting_id = c.lastrowid
+        # Retrieve the ID of the newly created meeting
+        meeting_id = c.lastrowid
 
-    # Commit the changes and close the database connection
-    conn.commit()
-    conn.close()
+        # Commit the changes and close the database connection
+        conn.commit()
+        conn.close()
 
-    # Return the meeting ID in the response
-    return jsonify({'message': 'Meeting created successfully.', 'meeting_id': meeting_id})
+        # Return the meeting ID in the response
+        return jsonify({'message': 'Meeting created successfully.', 'meeting_id': meeting_id})
 
 #Delete meeting row
 @students_api.route('/api/meetings/<int:meeting_id>', methods=['DELETE'])
