@@ -1,0 +1,45 @@
+{% extends "base2.html" %}
+
+{% block content %}
+<head>
+  <meta charset="UTF-8">
+  <title>Student Dashboard</title>
+  <script src="https://code.jquery.com/jquery-3.6.2.min.js"></script>
+</head>
+<body>
+  <h1>Aankomende Lessen</h1>
+  <ul id="meetings-list"></ul>
+  <script>
+    $(document).ready(function() {
+      // Make a GET request to the API endpoint
+      $.ajax({
+        url: '/api/upcoming_meetings',
+        type: 'GET',
+        dataType: 'json',
+        success: function(data) {
+          // Iterate over the meetings and add them to the list
+          var meetings = data.upcoming_meetings;
+          meetings.forEach(function(meeting) {
+            var title = meeting[0];
+            var date = meeting[1];
+            var time = meeting[2];
+            var duration = meeting[3];
+            var location = meeting[4];
+            var description = meeting[5];
+            var listItem = $('<li>').text(title + ' - ' + date + ' ' + time);
+            var checkinButton = $('<button>').text('Check in').data('meeting-id', meeting[6]).click(function() {
+              window.location.href = '/checkin/<int:meeting_id>' + $(this).data('meeting-id');
+            });
+            listItem.append(checkinButton);
+            $('#meetings-list').append(listItem);
+          });
+        },
+        error: function(error) {
+          console.log(error);
+        }
+      });
+    });    
+  </script>
+</body>
+{% endblock %}
+

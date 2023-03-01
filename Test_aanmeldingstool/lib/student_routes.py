@@ -10,7 +10,7 @@ student_route = Blueprint('student_route', __name__)
 @student_route.route('/check_in', methods=['GET', 'POST'])
 def check_in():
     if 'student_logged_in' in session:
-        return render_template('checkin.html')
+        return render_template('checkin2.html')
     else:
         flash('Log alstublieft eerst in', 'danger')
         return redirect(url_for('login'))
@@ -41,3 +41,12 @@ def rooster():
 
     # Geef de verwerkte ics gegevens door aan de template
     return render_template('rooster.html', events=events)
+
+@student_route.route('student/upcoming_meetings')
+def s_upcoming_meetings():
+    return render_template('student_upcoming_meetings.html')
+
+@student_route.route('/checkin/<int:meeting_id>', methods=['GET'])
+def checkin_page(meeting_id):
+    # Render the check-in page with the meeting ID
+    return render_template('checkin2.html', meeting_id=meeting_id)
