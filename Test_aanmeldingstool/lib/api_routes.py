@@ -424,16 +424,6 @@ def api_checkin(student, meeting):
         conn.close()
         return jsonify({'error': f'Student {student} not found'}), 404
 
-    # Check if the meeting exists
-    #meeting_query = c.execute('SELECT * FROM Meeting WHERE Meeting_id = ? AND Meeting_date = ? AND Meeting_time BETWEEN ? AND ?',
-                    #(meeting, attendance_date, (datetime.now() - timedelta(minutes=10)).strftime('%H:%M'), datetime.now().strftime('%H:%M')))
-    #meeting_data = meeting_query.fetchone()
-    #print(datetime.now)
-    #if not meeting_data:
-        #conn.close()
-        #return jsonify({'error': f'Meeting {meeting} not found'}), 404
-    # Check if the meeting exists
-
     meeting_query = c.execute('SELECT * FROM Meeting WHERE Meeting_id = ? AND Meeting_date = ?', (meeting, attendance_date,))
     meeting_data = meeting_query.fetchone()
 
@@ -442,7 +432,7 @@ def api_checkin(student, meeting):
         return jsonify({'error': f'Meeting {meeting} not found'}), 404
 
     meeting_time = meeting_data[3] # Extract the meeting time from the database
-    print(meeting_time)
+    print(meeting_query)
     current_time = datetime.now(amsterdam_tz).strftime('%H:%M')
 
     # Check if the current time is between 10 minutes before and 20 minutes after the meeting time
@@ -591,7 +581,7 @@ def get_upcoming_meetings():
     c = conn.cursor()
 
     # Get the upcoming meetings
-    c.execute('SELECT Meeting_title, Meeting_date, Meeting_time, Meeting_duration, Meeting_location, Meeting_description FROM Meeting WHERE Meeting_date >= ? ORDER BY Meeting_date ASC',
+    c.execute('SELECT Meeting_title, Meeting_date, Meeting_time, Meeting_duration, Meeting_location, Meeting_description FROM Meeting WHERE Meeting_date >= ? ORDER BY Meeting_date ASC, Meeting_time ASC',
               (datetime.now().strftime('%Y-%m-%d'),))
     meetings = c.fetchall()
 

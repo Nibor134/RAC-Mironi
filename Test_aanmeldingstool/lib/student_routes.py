@@ -10,6 +10,7 @@ student_route = Blueprint('student_route', __name__)
 @student_route.route('/check_in', methods=['GET', 'POST'])
 def check_in():
     if 'student_logged_in' in session:
+        print(session)
         return render_template('checkin2.html')
     else:
         flash('Log alstublieft eerst in', 'danger')
@@ -17,30 +18,35 @@ def check_in():
     
 @student_route.route('/rooster')
 def rooster():
-    # Haal de ics file op vanaf de URL
-    url = 'https://roosterapi.hr.nl/timetables/personalized/0909114/export'
-    response = requests.get(url)
-    ics_content = response.text
-    cal_data = response.content.decode('utf-8')
-    # Verwerk de ics file met behulp van icalendar module
-    cal = Calendar.from_ical(cal_data)
-    events = []
-    for event in cal.walk('VEVENT'):
-        event_summary = event.get('summary')
-        event_location = event.get('location')
-        event_description = event.get('description')
-        event_start = event.get('dtstart').dt
-        event_end = event.get('dtend').dt
-        events.append({
-            'summary': event_summary,
-            'location': event_location,
-            'description': event_description,
-            'start': event_start,
-            'end': event_end
-        })
+    if 'student_logged_in' in session:
+        # Haal de ics file op vanaf de URL
+        username = session.get('username')
+        url = f'https://roosterapi.hr.nl/timetables/personalized/{username}/export'
+        response = requests.get(url)
+        ics_content = response.text
+        cal_data = response.content.decode('utf-8')
+        # Verwerk de ics file met behulp van icalendar module
+        cal = Calendar.from_ical(cal_data)
+        events = []
+        for event in cal.walk('VEVENT'):
+            event_summary = event.get('summary')
+            event_location = event.get('location')
+            event_description = event.get('description')
+            event_start = event.get('dtstart').dt
+            event_end = event.get('dtend').dt
+            events.append({
+                'summary': event_summary,
+                'location': event_location,
+                'description': event_description,
+                'start': event_start,
+                'end': event_end
+            })
 
-    # Geef de verwerkte ics gegevens door aan de template
-    return render_template('rooster.html', events=events)
+        # Geef de verwerkte ics gegevens door aan de template
+        return render_template('rooster.html', events=events)
+    else:
+        flash('Log alstublieft eerst in', 'danger')
+    return redirect(url_for('login'))
 
 @student_route.route('/student/upcoming_meetings')
 def s_upcoming_meetings():
