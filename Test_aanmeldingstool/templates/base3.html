@@ -71,8 +71,10 @@ body {
         <a href="{{ url_for('teacher_dashboard') }}">Startpagina</a>
         <a href="{{ url_for('teacher.create_class') }}">Creeër een Les</a>
         <a href="{{ url_for('teacher.view_classes') }}">Bekijk lessen</a>
+        <a href="{{ url_for('teacher.attendance') }}">Aanwezigheid</a>
+        <a href="{{ url_for('teacher.make_meeting') }}">Creeër een meeting</a>
+        <a href="{{ url_for('teacher.t_upcoming_meetings') }}">Aankomende meetings</a>
         <a href="{{ url_for('logout') }}">Uitloggen</a>
-        
   </div>
   <div class="container mt-4">
     {% block content %}{% endblock %}

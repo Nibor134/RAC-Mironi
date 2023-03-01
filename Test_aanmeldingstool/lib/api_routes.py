@@ -332,7 +332,6 @@ def delete_schedule(schedule_id):
     return message
 
 
-
 @students_api.route('/api/students', methods=['GET'])
 def api_get_students():
     return jsonify(get_students())
@@ -404,8 +403,42 @@ def api_update_by_id_schedule(schedule_id):
 def api_delete_schedule(schedule_id):
     return jsonify(delete_schedule(schedule_id))
 
-@students_api.route('/api/checkin/<int:student>', methods=['POST'])
-def api_checkin(student):
+@students_api.route('/api/checkin/<int:student>/<int:meeting>', methods=['POST'])
+def api_checkin(student, meeting):
+    data = request.json
+    attendance_date = datetime.now().strftime('%Y-%m-%d')
+    attendance_time = datetime.now().strftime('%H:%M:%S')
+    status = data.get('status')
+    question = data.get('question')
+    answer = data.get('answer')
+    reason = data.get('reason')
+
+    # Check if the student exists
+    conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
+    c = conn.cursor()
+    student_query = c.execute('SELECT * FROM Students WHERE Studentnumber = ?', (student,))
+    student_data = student_query.fetchone()
+    if not student_data:
+        conn.close()
+        return jsonify({'error': f'Student {student} not found'}), 404
+
+    # Check if the meeting exists
+    meeting_query = c.execute('SELECT * FROM Meeting WHERE Meeting_id = ?', (meeting,))
+    meeting_data = meeting_query.fetchone()
+    if not meeting_data:
+        conn.close()
+        return jsonify({'error': f'Meeting {meeting} not found'}), 404
+
+    # Add the attendance record
+    c.execute('INSERT INTO Attendance (Student_id, Studentnumber, Meeting_id, Attendance_date, Attendance_time, Status, Question, Answer, Reason) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                (student_data[0], student_data[6], meeting, attendance_date, attendance_time, status, question, answer, reason,))
+    conn.commit()
+    conn.close()
+
+    return jsonify({'message': f'Student {student} checked in to meeting {meeting} successfully'}), 200
+
+#@students_api.route('/api/checkin/<int:student>', methods=['POST'])
+#def api_checkin(student):
     data = request.json
     attendance_date = datetime.now().strftime('%Y-%m-%d')
     attendance_time = datetime.now().strftime('%H:%M:%S')
@@ -439,11 +472,11 @@ def get_random_question():
 
 @students_api.route('/api/attendance', methods=['GET'])
 def get_attendance():
-    conn = connect_to_db()
+    conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
     cursor = conn.cursor()
 
     # Retrieve attendance records from the database
-    cursor.execute('SELECT Students.student_name, Students.studentnumber, Attendance.Attendance_date, Attendance.Attendance_time, Attendance.Status, Students.Class_id FROM Students INNER JOIN Attendance ON Students.Student_id=Attendance.Student_id')
+    cursor.execute('SELECT Students.student_name, Students.studentnumber, Attendance.Attendance_date, Attendance.Attendance_time, Attendance.Status, Attendance.Meeting_id, Students.class_id FROM Students INNER JOIN Attendance ON Students.Student_id=Attendance.Student_id')
     rows = cursor.fetchall()
 
     # Convert the records into a list of dictionaries
@@ -455,11 +488,31 @@ def get_attendance():
             'date': row[2],
             'time': row[3],
             'status': row[4],
-            'class_id': row[5]
+            'Meeting_id':row[5],
+            'class_id': row[6]
         })
     conn.close()
 
     return jsonify({'attendance': attendance})
+
+import sqlite3
+
+@students_api.route('/api/attendance/<int:attendance_id>', methods=['DELETE'])
+def delete_attendance(attendance_id):
+    # Connect to the database
+    conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
+    c = conn.cursor()
+
+    # Delete the attendance record with the given attendance_id
+    c.execute('DELETE FROM Attendance WHERE Attendance_id = ?', (attendance_id,))
+
+    # Commit the changes and close the database connection
+    conn.commit()
+    conn.close()
+
+    # Return a success message
+    return jsonify({'message': f'Attendance record with id {attendance_id} deleted successfully.'})
+
 
 @students_api.route('/api/create_meeting', methods=['POST'])
 def create_meeting():
@@ -492,6 +545,7 @@ def create_meeting():
     # Return the meeting ID in the response
     return jsonify({'message': 'Meeting created successfully.', 'meeting_id': meeting_id})
 
+#Delete meeting row
 @students_api.route('/api/meetings/<int:meeting_id>', methods=['DELETE'])
 def delete_meeting(meeting_id):
     # Connect to the database
@@ -507,3 +561,21 @@ def delete_meeting(meeting_id):
 
     # Return a success message
     return jsonify({'message': f'Meeting with id {meeting_id} deleted successfully.'})
+
+@students_api.route('/api/upcoming_meetings', methods=['GET'])
+def get_upcoming_meetings():
+    # Connect to the database
+    conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
+    c = conn.cursor()
+
+    # Get the upcoming meetings
+    c.execute('SELECT Meeting_title, Meeting_date, Meeting_time, Meeting_duration, Meeting_location, Meeting_description FROM Meeting WHERE Meeting_date >= ? ORDER BY Meeting_date ASC',
+              (datetime.now().strftime('%Y-%m-%d'),))
+    meetings = c.fetchall()
+
+    # Close the database connection
+    conn.close()
+
+    # Return the meetings in the response
+    return jsonify({'upcoming_meetings': meetings})
+
