@@ -34,21 +34,21 @@
   </div>
   <h1>Aanwezigheid</h1>
   <div id="attendance-table">
-    <table class="table" id="attendance-table">
-        <thead>
-          <tr>
-            <th>Datum</th>
-            <th>Tijd</th>
-            <th>Naam</th>
-            <th>Studentnummer</th>
-            <th>Status</th>
-            <th>Klas</th>
-            <th>Meeting</th>
-          </tr>
-        </thead>
-        <tbody>
-        </tbody>
-      </table>
+    <table class="table table-striped" id="attendance-table">
+      <thead class="thead-dark">
+        <tr>
+          <th scope="col">Datum</th>
+          <th scope="col">Tijd</th>
+          <th scope="col">Naam</th>
+          <th scope="col">Studentnummer</th>
+          <th scope="col">Status</th>
+          <th scope="col">Klas</th>
+          <th scope="col">Meeting</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>    
   </div>
 
   <script>
@@ -64,7 +64,7 @@
   </script>
     <script>
 function getAttendance() {
-  $.get("/api/attendance?meeting_id={{ meeting[0] }}", function(data) {
+  $.get("/api/attendance/v2?meeting_id={{ meeting_id }}", function(data) {
     var attendance = data.attendance;
     var tableBody = $('#attendance-table > tbody');
     tableBody.empty();

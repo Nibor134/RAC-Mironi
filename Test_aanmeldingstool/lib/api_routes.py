@@ -481,6 +481,35 @@ def get_random_question():
     question = random.choice(questions)
     return jsonify({'question': question})
 
+@students_api.route('/api/attendance/v2', methods=['GET'])
+def get_attendance_v2():
+    # Get the meeting_id from the query parameters
+    meeting_id = request.args.get('meeting_id')
+
+    # Connect to the database
+    conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
+    cursor = conn.cursor()
+
+    # Retrieve attendance records from the database for the current meeting_id
+    cursor.execute('SELECT Students.student_name, Students.studentnumber, Attendance.Attendance_date, Attendance.Attendance_time, Attendance.Status, Attendance.Meeting_id, Students.class_id FROM Students INNER JOIN Attendance ON Students.Student_id=Attendance.Student_id WHERE Attendance.Meeting_id = ?', (meeting_id,))
+    rows = cursor.fetchall()
+
+    # Convert the records into a list of dictionaries
+    attendance = []
+    for row in rows:
+        attendance.append({
+            'student_name': row[0],
+            'studentnumber': row[1],
+            'date': row[2],
+            'time': row[3],
+            'status': row[4],
+            'Meeting_id':row[5],
+            'class_id': row[6]
+        })
+    conn.close()
+
+    return jsonify({'attendance': attendance})
+
 
 @students_api.route('/api/attendance', methods=['GET'])
 def get_attendance():
