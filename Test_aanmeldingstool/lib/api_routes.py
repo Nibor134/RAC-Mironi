@@ -610,7 +610,7 @@ def get_upcoming_meetings():
     c = conn.cursor()
 
     # Get the upcoming meetings
-    c.execute('SELECT Meeting_title, Meeting_date, Meeting_time, Meeting_duration, Meeting_location, Meeting_description FROM Meeting WHERE Meeting_date >= ? ORDER BY Meeting_date ASC, Meeting_time ASC',
+    c.execute('SELECT Meeting_id, Meeting_title, Meeting_date, Meeting_time, Meeting_duration, Meeting_location, Meeting_description FROM Meeting WHERE Meeting_date >= ? ORDER BY Meeting_date ASC, Meeting_time ASC',
               (datetime.now().strftime('%Y-%m-%d'),))
     meetings = c.fetchall()
 
