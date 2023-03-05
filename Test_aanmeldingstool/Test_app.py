@@ -177,4 +177,4 @@ def logout():
     return redirect(url_for('login'))
 
 if __name__ == "__main__":
-    app.run(host= '192.168.178.73', debug=FLASK_DEBUG)
+    app.run(host=FLASK_IP, port=FLASK_PORT, debug=FLASK_DEBUG)
