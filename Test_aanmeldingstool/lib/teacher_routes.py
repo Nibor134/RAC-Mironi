@@ -3,6 +3,7 @@ from flask import Flask, request, jsonify, Blueprint, session, redirect, render_
 from flask_cors import CORS
 import datetime
 import sqlite3
+import socket
 
 teacher = Blueprint('teacher', __name__)
 
@@ -46,6 +47,7 @@ def view_classes():
 @teacher.route('/aanwezigheid', methods=['GET', 'POST'])
 def attendance():
     if 'teacher_logged_in' in session:
+        print(session)
         return render_template('aanwezigheid.html')
     else:
         flash('Log alstublieft eerst in', 'danger')
@@ -53,7 +55,12 @@ def attendance():
 
 @teacher.route('/meetings/<int:meeting_id>')
 def meeting(meeting_id):
+    hostname = socket.gethostname()
+
+    ip_address = socket.gethostbyname(hostname)
+    ip_str = str(ip_address)
     
+
     # Connect to the database
     conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
     c = conn.cursor()
@@ -66,7 +73,7 @@ def meeting(meeting_id):
     conn.close()
 
     # Render the meeting template with the meeting data
-    return render_template('meetings.html', meeting=meeting)
+    return render_template('meetings.html', meeting=meeting, ip_str=ip_str, meeting_id=meeting_id )
 
 
 @teacher.route('/create_meeting')

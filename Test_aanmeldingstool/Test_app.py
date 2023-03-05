@@ -3,6 +3,7 @@ import sqlite3
 from lib.api_routes import students_api
 from lib.teacher_routes import teacher
 from lib.student_routes import student_route
+import socket
 
 app = Flask(__name__)
 app.register_blueprint(students_api)
@@ -10,6 +11,7 @@ app.register_blueprint(teacher)
 app.register_blueprint(student_route)
 
 app.secret_key = 'your-secret-key'
+
 
 conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db', check_same_thread=False)
 c = conn.cursor()
@@ -19,6 +21,8 @@ LISTEN_ALL = "0.0.0.0"
 FLASK_IP = LISTEN_ALL
 FLASK_PORT = 80
 FLASK_DEBUG = True
+
+
 
 @app.route('/')
 def index():
@@ -76,8 +80,8 @@ def get_admin_by_username(username):
     else:
         return None
 
-@app.route('/login_redirect', methods=['GET', 'POST'])
-def login_for_redirect():
+@app.route('/login_redirect/<int:meeting_id>', methods=['GET', 'POST'])
+def login_for_redirect(meeting_id):
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -90,12 +94,11 @@ def login_for_redirect():
                 session.clear()
                 session['student_logged_in'] = True
                 session['username'] = student['studentnumber']
-                flash('You were successfully logged in!', 'success')
-                return redirect(url_for('student_route.check_in'))
+                return redirect(url_for('student_route.check_in', meeting_id=meeting_id))
             else:
                 flash('Ongeldige inloggegevens.', 'danger')
                 return redirect(url_for('login'))
-    return render_template('login_test.html')
+    return render_template('login_redirect.html', meeting_id=meeting_id)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -110,7 +113,7 @@ def login():
             if student and student['password'] == password:
                 session.clear()
                 session['student_logged_in'] = True
-                session['username'] = student['studentnumber']
+                session['username'] = str(student['studentnumber'])
                 flash('You were successfully logged in!', 'success')
                 return redirect(url_for('student_dashboard'))
             else:

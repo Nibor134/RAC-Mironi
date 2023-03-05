@@ -430,8 +430,9 @@ def api_checkin(student, meeting):
     if not meeting_data:
         conn.close()
         return jsonify({'error': f'Meeting {meeting} not found'}), 404
-
-    meeting_time = meeting_data[3] # Extract the meeting time from the database
+    
+    # Extract the meeting time from the database
+    meeting_time = meeting_data[3] 
     current_time = datetime.now(amsterdam_tz).strftime('%H:%M')
 
     # Check if the current time is between 10 minutes before and 20 minutes after the meeting time
@@ -505,8 +506,6 @@ def get_attendance():
     conn.close()
 
     return jsonify({'attendance': attendance})
-
-import sqlite3
 
 @students_api.route('/api/attendance/<int:attendance_id>', methods=['DELETE'])
 def delete_attendance(attendance_id):

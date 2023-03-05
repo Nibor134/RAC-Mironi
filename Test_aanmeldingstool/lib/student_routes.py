@@ -7,14 +7,14 @@ from icalendar import Calendar
 
 student_route = Blueprint('student_route', __name__)
 
-@student_route.route('/check_in', methods=['GET', 'POST'])
-def check_in():
-    if 'student_logged_in' in session:
-        print(session)
-        return render_template('checkin2.html')
-    else:
-        flash('Log alstublieft eerst in', 'danger')
-        return redirect(url_for('login_for_redirect'))
+#@student_route.route('/check_in/<int:meeting_id>', methods=['GET', 'POST'])
+#def check_in():
+    #if 'student_logged_in' in session:
+       # print(session)
+        #return render_template('checkin2.html')
+    #else:
+        #flash('Log alstublieft eerst in', 'danger')
+        #return redirect(url_for('login_for_redirect'))
     
 @student_route.route('/rooster')
 def rooster():
@@ -53,6 +53,10 @@ def s_upcoming_meetings():
     return render_template('student_upcoming_meetings.html')
 
 @student_route.route('/checkin/<int:meeting_id>', methods=['GET'])
-def checkin_page(meeting_id):
-    # Render the check-in page with the meeting ID
-    return render_template('checkin2.html', meeting_id=meeting_id)
+def check_in(meeting_id):
+    if 'student_logged_in' in session:
+        print(session)
+        return render_template('checkin2.html', meeting_id=meeting_id)
+    else:
+        flash('Log alstublieft eerst in', 'danger')
+        return redirect(url_for('login_for_redirect', meeting_id=meeting_id))

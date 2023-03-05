@@ -6,7 +6,7 @@
 </head>
 <body>
   <div class="container mt-4">
-    <h1>Welkom, {{ username }}!</h1>
+    <h1>Welkom, {{ session.name }}!</h1>
     <h2>Creeër een les:</h2>
     <form method="POST" action="{{ url_for('teacher.create_class') }}">
       <div class="form-group">

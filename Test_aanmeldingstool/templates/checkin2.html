@@ -9,10 +9,10 @@
   <h1>Student Check-In</h1>
   <form id="checkin-form" method="POST">
     <label for="student-number">Studentnummer:</label>
-    <input type="text" name="student-number" id="student-number" value= "{{ session.username }}" required >
+    <input type="text" name="student-number" id="student-number" value="{{ '{:0>7}'.format(session.username) }}" required >
     <br>
     <label for="meeting-number">Meeting ID:</label>
-    <input type="text" name="meeting-number" id="meeting-number" required>
+    <input type="text" name="meeting-number" id="meeting-number" value= "{{ meeting_id }}" required>
     <br>
     <label for="status">Status:</label>
     <select name="status" id="status" required>
@@ -39,53 +39,57 @@
   <script>
     // Gets a random question and display it
     $(document).ready(function() {
-        // Show the question by default
-        $.ajax({
-          url: '/api/questions/random',
-          type: 'GET',
-          success: function(data) {
-            $('#question-text').text(data.question);
-            $('#question').val(data.question);
-            $('#question-container').show();
-          }
-        });
+  // Show the question by default
+  $.ajax({
+    url: '/api/questions/random',
+    type: 'GET',
+    success: function(data) {
+      $('#question-text').text(data.question);
+      $('#question').val(data.question);
+      $('#question-container').show();
+    }
+  });
+
+  // Hide the question when status is changed to "absent"
+  $('#status').on('change', function() {
+    if ($(this).val() === 'absent') {
+      $('#question-container').hide();
+      $('#reason-container').show();
+    } else {
+      $('#question-container').show();
+      $('#reason-container').hide();
+    }
+  });
+
+  // Submit the form data to the server
+  $('#checkin-form').on('submit', function(event) {
+  event.preventDefault();
+  var data = {
+    'status': $('#status').val(),
+    'question': $('#question').val(),
+    'answer': $('#answer').val(),
+    'reason': $('#reason').val()
+  };
+  var studentNumber = $('#student-number').val();
+  var meetingNumber = $('#meeting-number').val();
+  var encodedStudentNumber = studentNumber.padStart(7, '0'); // add leading zeros if necessary
+  $.ajax({
+    url: '/api/checkin/' + encodeURIComponent(encodedStudentNumber) + '/' + encodeURIComponent(meetingNumber),
+    type: 'POST',
+    data: JSON.stringify(data),
+    contentType: 'application/json',
+    success: function(response) {
+      alert(response.message);
+    },
+    error: function(xhr, status, error) {
+      alert('Error checking in: ' + xhr.responseText);
+      }
+    });
+   
+  });
+});
+
       
-        // Hide the question when status is changed to "absent"
-        $('#status').on('change', function() {
-          if ($(this).val() === 'absent') {
-            $('#question-container').hide();
-            $('#reason-container').show();
-          } else {
-            $('#question-container').show();
-            $('#reason-container').hide();
-          }
-        });
-      
-        // Submit the form data to the server
-        $('#checkin-form').on('submit', function(event) {
-          event.preventDefault();
-          var data = {
-            'status': $('#status').val(),
-            'question': $('#question').val(),
-            'answer': $('#answer').val(),
-            'reason': $('#reason').val()
-          };
-          var studentNumber = $('#student-number').val();
-          var meetingNumber = $('#meeting-number').val();
-          $.ajax({
-            url: '/api/checkin/' + studentNumber + '/' + meetingNumber,
-            type: 'POST',
-            data: JSON.stringify(data),
-            contentType: 'application/json',
-            success: function(response) {
-              alert(response.message);
-            },
-            error: function(xhr, status, error) {
-              alert('Error checking in: ' + xhr.responseText);
-            }
-          });
-        });
-      });
   </script>
 </body>
 {% endblock %}
