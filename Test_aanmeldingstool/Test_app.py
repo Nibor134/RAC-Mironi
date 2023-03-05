@@ -15,6 +15,7 @@ app.secret_key = 'your-secret-key'
 
 conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db', check_same_thread=False)
 c = conn.cursor()
+
 # Flask Settings
 
 LISTEN_ALL = "0.0.0.0"
@@ -97,7 +98,7 @@ def login_for_redirect(meeting_id):
                 return redirect(url_for('student_route.check_in', meeting_id=meeting_id))
             else:
                 flash('Ongeldige inloggegevens.', 'danger')
-                return redirect(url_for('login'))
+                return redirect(url_for('login_for_redirect', meeting_id=meeting_id))
     return render_template('login_redirect.html', meeting_id=meeting_id)
 
 @app.route('/login', methods=['GET', 'POST'])
