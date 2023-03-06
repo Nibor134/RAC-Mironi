@@ -19,13 +19,13 @@
         // Iterate over the meetings and add them to the list
         var meetings = data.upcoming_meetings;
         meetings.forEach(function(meeting) {
-          var title = meeting[0];
-          var date = meeting[1];
-          var time = meeting[2];
-          var duration = meeting[3];
-          var location = meeting[4];
-          var description = meeting[5];
-          var meetingId = meeting[6];
+          var meetingId = meeting[0];
+          var title = meeting[1];
+          var date = meeting[2];
+          var time = meeting[3];
+          var duration = meeting[4];
+          var location = meeting[5];
+          var description = meeting[6];
 
           // Create a card for each meeting
           var card = $('<div class="card my-3">');
@@ -33,10 +33,13 @@
           var cardTitle = $('<h5 class="card-title">').text(title);
           var cardSubtitle = $('<h6 class="card-subtitle mb-2 text-muted">').text(date + ' ' + time);
           var cardText = $('<p class="card-text">').text(description);
+          var cardlocation = $('<p class="card-text">').text(location);
           var checkinButton = $('<a href="/checkin/' + meetingId + '" class="card-link">').text('Check in');
 
+          
           cardBody.append(cardTitle);
           cardBody.append(cardSubtitle);
+          cardBody.append(location);
           cardBody.append(cardText);
           cardBody.append(checkinButton);
           card.append(cardBody);

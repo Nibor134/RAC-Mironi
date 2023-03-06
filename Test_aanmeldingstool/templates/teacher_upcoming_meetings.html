@@ -34,12 +34,14 @@
           var cardTitle = $('<h5 class="card-title">').text(title);
           var cardSubtitle = $('<h6 class="card-subtitle mb-2 text-muted">').text(date + ' ' + time);
           var cardText = $('<p class="card-text">').text(description);
-          var cardLink = $('<a class="btn btn-primary" href="/meetings/' + meetingId + '">').text('Ga naar vergadering');
+          var cardlocation = $('<p class="card-text">').text(location);
+          var cardLink = $('<a class="btn btn-primary" href="/meetings/' + meetingId + '">').text('Ga naar details les');
           
 
           cardBody.append(cardmeetingId);
           cardBody.append(cardTitle);
           cardBody.append(cardSubtitle);
+          cardBody.append(location);
           cardBody.append(cardText);
           cardBody.append(cardLink);
           card.append(cardBody);

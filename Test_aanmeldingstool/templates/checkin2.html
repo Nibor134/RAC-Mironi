@@ -9,7 +9,7 @@
   <h1>Student Check-In</h1>
   <form id="checkin-form" method="POST">
     <label for="student-number">Studentnummer:</label>
-    <input type="text" name="student-number" id="student-number" value= "{{ session.username }}" required >
+    <input type="text" name="student-number" id="student-number" value="{{ session.username }}" required pattern="\d{7}">
     <br>
     <label for="meeting-number">Meeting ID:</label>
     <input type="text" name="meeting-number" id="meeting-number" value= "{{ meeting_id }}" required>
