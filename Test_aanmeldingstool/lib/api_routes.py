@@ -418,10 +418,11 @@ def api_checkin(student, meeting):
     # Check if the student exists
     conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
     c = conn.cursor()
-    student_query = c.execute('SELECT * FROM Students WHERE Studentnumber = ?', (student,))
+    student_query = c.execute('SELECT * FROM Students WHERE Studentnumber = ?', (str(student).zfill(7),))
     student_data = student_query.fetchone()
     if not student_data:
         conn.close()
+        print(student)
         return jsonify({'error': f'Student {student} not found'}), 404
 
     meeting_query = c.execute('SELECT * FROM Meeting WHERE Meeting_id = ? AND Meeting_date = ?', (meeting, attendance_date,))
@@ -602,6 +603,23 @@ def delete_meeting(meeting_id):
 
     # Return a success message
     return jsonify({'message': f'Meeting with id {meeting_id} deleted successfully.'})
+
+@students_api.route('/api/all_meetings', methods=['GET'])
+def get_meetings():
+    # Connect to the database
+    conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
+    c = conn.cursor()
+
+    # Get all meetings
+    c.execute('SELECT Meeting_id, Meeting_title, Meeting_date, Meeting_time, Meeting_duration, Meeting_location, Meeting_description FROM Meeting ORDER BY Meeting_date ASC, Meeting_time ASC')
+    meetings = c.fetchall()
+
+    # Close the database connection
+    conn.close()
+
+    # Return the meetings in the response
+    return jsonify({'upcoming_meetings': meetings})
+
 
 @students_api.route('/api/upcoming_meetings', methods=['GET'])
 def get_upcoming_meetings():

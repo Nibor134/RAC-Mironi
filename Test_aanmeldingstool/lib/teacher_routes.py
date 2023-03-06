@@ -84,3 +84,7 @@ def make_meeting():
 @teacher.route('/teacher/upcoming_meetings')
 def t_upcoming_meetings():
     return render_template('teacher_upcoming_meetings.html')
+
+@teacher.route('/teacher/all_meetings')
+def t_all_meetings():
+    return render_template('teacher_all_meetings.html')
