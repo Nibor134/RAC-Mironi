@@ -4,18 +4,11 @@ from flask_cors import CORS
 import requests
 import sqlite3
 from icalendar import Calendar
+import pytz
 
 student_route = Blueprint('student_route', __name__)
+amsterdam_tz = pytz.timezone('Europe/Amsterdam')
 
-#@student_route.route('/check_in/<int:meeting_id>', methods=['GET', 'POST'])
-#def check_in():
-    #if 'student_logged_in' in session:
-       # print(session)
-        #return render_template('checkin2.html')
-    #else:
-        #flash('Log alstublieft eerst in', 'danger')
-        #return redirect(url_for('login_for_redirect'))
-    
 @student_route.route('/rooster')
 def rooster():
     if 'student_logged_in' in session:
@@ -32,8 +25,12 @@ def rooster():
             event_summary = event.get('summary')
             event_location = event.get('location')
             event_description = event.get('description')
-            event_start = event.get('dtstart').dt
-            event_end = event.get('dtend').dt
+            event_start_utc = event.get('dtstart').dt
+            event_end_utc = event.get('dtend').dt
+            event_start_amsterdam = event_start_utc.astimezone(amsterdam_tz)
+            event_end_amsterdam = event_end_utc.astimezone(amsterdam_tz)
+            event_start = event_start_amsterdam.strftime('%Y-%m-%d %H:%M:%S')
+            event_end = event_end_amsterdam.strftime('%Y-%m-%d %H:%M:%S')
             events.append({
                 'summary': event_summary,
                 'location': event_location,
