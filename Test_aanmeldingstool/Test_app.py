@@ -33,8 +33,9 @@ def index():
 @app.route('/student_dashboard')
 def student_dashboard():
     if 'student_logged_in' in session:
-        student_id = session.get('user_id')
-        return render_template('student_dashboard.html',)
+        c.execute('SELECT student_name FROM Students WHERE Studentnumber = ?', (session['username'],))
+        name_s = c.fetchone()[0]
+        return render_template('student_dashboard.html', name_s=name_s)
     else:
         flash('Ongeldige inloggegevens.', 'danger')
         return redirect(url_for('login'))
