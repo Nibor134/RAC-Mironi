@@ -31,6 +31,17 @@
           <label for="description">Beschrijving:</label>
           <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
         </div>
+        <div class="form-group">
+          <label for="class_id">Klas:</label>
+          <select class="form-control" id="class_id" name="class_id">
+            <option value="none">Selecteer een klas</option>
+            <option value="1">SWDVT1A</option>
+            <option value="2">SWDVT1B</option>
+            <option value="3">SWDVT1C</option>
+            <option value="4">SWDVT1D</option>
+            <option value="none">Alle klassen</option>
+          </select>
+        </div>
         <button type="submit" class="btn btn-primary">Creëer</button>
       </form>
     </div>
@@ -50,7 +61,8 @@
               'time': $('#time').val(),
               'duration': $('#duration').val(),
               'location': $('#location').val(),
-              'description': $('#description').val()
+              'description': $('#description').val(),
+              'class_id': $('#class_id').val()
             }),
             contentType: 'application/json',
             success: function(data) {

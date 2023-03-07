@@ -68,12 +68,16 @@ def meeting(meeting_id):
     # Retrieve the meeting with the requested ID from the database
     c.execute('SELECT * FROM Meeting WHERE Meeting_id = ?', (meeting_id,))
     meeting = c.fetchone()
+    print(meeting[10])
 
+    # Retrieve the class name using the class_id from the meeting
+    c.execute('SELECT classname FROM Class WHERE Class_id = ?', (meeting[10],))
+    class_name = c.fetchone()[0]
     # Close the database connection
     conn.close()
 
     # Render the meeting template with the meeting data
-    return render_template('meetings.html', meeting=meeting, ip_str=ip_str, meeting_id=meeting_id )
+    return render_template('meetings.html', meeting=meeting, ip_str=ip_str, meeting_id=meeting_id, class_name=class_name )
 
 
 @teacher.route('/create_meeting')

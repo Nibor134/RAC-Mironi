@@ -731,14 +731,15 @@ def create_meeting():
         meeting_description = data.get('description')
         created_by = data.get('created_by')
         created_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        class_id = data.get('class_id')
 
         # Connect to the database
         conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
         c = conn.cursor()
 
         # Add the new meeting to the database
-        c.execute('INSERT INTO Meeting (Meeting_title, Meeting_date, Meeting_time, Meeting_duration, Meeting_location, Meeting_description) VALUES (?, ?, ?, ?, ?, ?)', 
-                        (meeting_title, meeting_date, meeting_time, meeting_duration, meeting_location, meeting_description))
+        c.execute('INSERT INTO Meeting (Meeting_title, Meeting_date, Meeting_time, Meeting_duration, Meeting_location, Meeting_description, Class_id) VALUES (?, ?, ?, ?, ?, ?, ?)', 
+                        (meeting_title, meeting_date, meeting_time, meeting_duration, meeting_location, meeting_description, class_id))
 
         # Retrieve the ID of the newly created meeting
         meeting_id = c.lastrowid
@@ -848,6 +849,7 @@ def get_meetings():
             meeting["Created_by"] = i["Created_by"]
             meeting["Created_at"] = i["Created_at"]
             meeting["Updated_at"] = i["Updated_at"]
+            meeting["class_id"] = i["class_id"]
             meetings.append(meeting)
     except:
         meetings = []
