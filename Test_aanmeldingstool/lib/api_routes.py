@@ -437,7 +437,7 @@ def api_checkin(student, meeting):
 
     # Check if the current time is between 10 minutes before and 20 minutes after the meeting time
     checkin_open = datetime.strptime(current_time, '%H:%M') >= datetime.strptime(meeting_time, '%H:%M') - timedelta(minutes=10) \
-                   and datetime.strptime(current_time, '%H:%M') <= datetime.strptime(meeting_time, '%H:%M') + timedelta(minutes=2)
+                   and datetime.strptime(current_time, '%H:%M') <= datetime.strptime(meeting_time, '%H:%M') + timedelta(minutes=1)
     if not checkin_open:
         # Check-in has closed, get list of all students who have not checked in and are not already marked as absent
         attendance_query = c.execute('SELECT * FROM Attendance WHERE Meeting_id = ?', (meeting,))
@@ -445,15 +445,16 @@ def api_checkin(student, meeting):
         attendance_students = set(row[1] for row in attendance_data if row[5] != 'afwezig')
         students_query = c.execute('SELECT * FROM Students')
         students_data = students_query.fetchall()
+        
         for student_data in students_data:
-            if student_data[6] not in attendance_students:
-                # Check if the student is already marked as absent
-                existing_query = c.execute('SELECT * FROM Attendance WHERE Meeting_id = ? AND Studentnumber = ? AND Status = ?', (meeting, student_data[6], 'afwezig',))
+            if student_data[5] not in attendance_students:
+                # Check if the student is already marked as absent or present
+                existing_query = c.execute('SELECT * FROM Attendance WHERE Meeting_id = ? AND Studentnumber = ?', (meeting, student_data[5],))
                 existing_data = existing_query.fetchone()
                 if not existing_data:
                     # Insert new attendance record for this student with status set to 'afwezig'
-                    c.execute('INSERT INTO Attendance (Student_id, Studentnumber, Meeting_id, Attendance_date, Attendance_time, Status, Question, Answer, Reason) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                              (student_data[0], student_data[6], meeting, attendance_date, attendance_time, 'afwezig', None, None, None,))
+                    c.execute('INSERT INTO Attendance (Studentnumber, Student_id, Meeting_id, Attendance_date, Attendance_time, Status, Question, Answer, Reason) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                            (student_data[5], student_data[0], meeting, attendance_date, attendance_time, 'Afwezig', None, None, None,))
         conn.commit()
         conn.close()
         return jsonify({'error': f'Check-in for meeting {meeting} has closed'}), 403
@@ -467,7 +468,7 @@ def api_checkin(student, meeting):
 
     # Add the attendance record
     c.execute('INSERT INTO Attendance (Student_id, Studentnumber, Meeting_id, Attendance_date, Attendance_time, Status, Question, Answer, Reason) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            (student_data[0], student_data[6], meeting, attendance_date, attendance_time, status, question, answer, reason,))
+            (student_data[0], student, meeting, attendance_date, attendance_time, status, question, answer, reason,))
     conn.commit()
     conn.close()
 
