@@ -31,6 +31,8 @@
       <div class="card mb-4">
         <div class="card-body d-flex justify-content-center" id="qrcode"></div>
       </div>
+      <button id="close-meeting-btn" class="btn btn-danger" href="{{ url_for('teacher_dashboard') }}" data-meeting-id="{{ meeting.Meeting_id }}">Sluit de meeting</button>    
+
       </div>
     </div>
   </div>
@@ -86,6 +88,26 @@ function getAttendance() {
     });
   });
 }
+
+$(document).ready(function() {
+  var meeting_id = $('#close-meeting-btn').data('meeting-id');
+  
+  $('#close-meeting-btn').click(function() {
+    $.ajax({
+      url: '/api/close-meeting/{{ meeting_id }}',
+      type: 'POST',
+      success: function(data) {
+        
+        alert('Meeting closed successfully!');
+        window.location.href = '{{ url_for("teacher_dashboard") }}';
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+        alert('Error closing meeting: ' + textStatus);
+      }
+    });
+  });
+});
+
 
 $(document).ready(function() {
   getAttendance();
