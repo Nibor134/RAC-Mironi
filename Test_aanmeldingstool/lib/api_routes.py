@@ -405,6 +405,7 @@ def api_update_by_id_schedule(schedule_id):
 def api_delete_schedule(schedule_id):
     return jsonify(delete_schedule(schedule_id))
 
+
 @students_api.route('/api/checkin/<int:student>/<int:meeting>', methods=['POST'])
 def api_checkin(student, meeting):
     data = request.json
@@ -424,13 +425,18 @@ def api_checkin(student, meeting):
         conn.close()
         return jsonify({'error': f'Student {student} not found'}), 404
 
-    meeting_query = c.execute('SELECT * FROM Meeting WHERE Meeting_id = ? AND Meeting_date = ?', (meeting, attendance_date,))
+    meeting_query = c.execute('SELECT * FROM Meeting WHERE Meeting_id = ? AND Meeting_date = ? AND Meeting_status = ?', (meeting, attendance_date, 'open'))
     meeting_data = meeting_query.fetchone()
-    print(meeting_data[10])
+    print(meeting_data)
 
     if not meeting_data:
         conn.close()
         return jsonify({'error': f'Meeting {meeting} not found'}), 404
+    
+    if meeting_data[11] != 'open':
+        conn.close()
+        return jsonify({'error': f'Meeting {meeting} is not open'}), 403
+
     
     # Extract the meeting time from the database
     meeting_time = meeting_data[3] 
