@@ -1,0 +1,100 @@
+{% extends "base3.html" %}
+
+{% block content %}
+<div class="container">
+    <h1 class="my-4">Alle Lessen</h1>
+    <div class="row">
+      <div class="col-md-4 mb-3">
+        <label for="date-input">Datum:</label>
+        <input type="date" id="date-input" class="form-control" required>
+      </div>
+      <div class="col-md-2 mb-3">
+        <button id="filter-button" class="btn btn-primary">Filter</button>
+      </div>
+      <div class="col-md-2 mb-3">
+        <button id="reset-button" class="btn btn-secondary">Reset</button>
+      </div>
+    </div>
+    <div class="row" id="meetings-list">
+    </div>
+  </div>
+  
+
+<script src="https://code.jquery.com/jquery-3.6.2.min.js"></script>
+<script>
+    $(document).ready(function() {
+      // Get the meetings data from the server
+      $.ajax({
+        url: '/api/all_meetings',
+        type: 'GET',
+        dataType: 'json',
+        success: function(data) {
+          var meetings = data.upcoming_meetings;
+          
+          // Render all meetings
+          renderMeetings(meetings);
+  
+          // Handle the filter button click event
+          $('#filter-button').click(function() {
+            // Get the selected date from the input field
+            var selectedDate = $('#date-input').val();
+  
+            // Filter meetings by the selected date
+            var filteredMeetings = meetings.filter(function(meeting) {
+              return meeting[2] === selectedDate;
+            });
+  
+            // Render the filtered meetings
+            renderMeetings(filteredMeetings);
+          });
+
+          $('#reset-button').click(function() {
+            renderMeetings(meetings);
+            
+          });
+        },
+        error: function(error) {
+          console.log(error);
+        }
+      });
+  
+      // Render the given meetings in the meetings list container
+      function renderMeetings(meetings) {
+        var meetingsList = $('#meetings-list');
+        meetingsList.empty();
+  
+        // Iterate over the meetings and add them to the list
+        meetings.forEach(function(meeting) {
+          var meetingId = meeting[0];
+          var title = meeting[1];
+          var date = meeting[2];
+          var time = meeting[3];
+          var duration = meeting[4];
+          var location = meeting[5];
+          var description = meeting[6];
+  
+          // Create a card for each meeting
+          var card = $('<div class="card my-3">');
+          var cardBody = $('<div class="card-body">');
+          var cardmeetingId = $('<h5 class="card-title">').text(meetingId);
+          var cardTitle = $('<h5 class="card-title">').text(title);
+          var cardSubtitle = $('<h6 class="card-subtitle mb-2 text-muted">').text(date + ' ' + time);
+          var cardText = $('<p class="card-text">').text(description);
+          var cardlocation = $('<p class="card-text">').text(location);
+          var cardLink = $('<a class="btn btn-primary" href="/meetings/' + meetingId + '">').text('Ga naar details les');
+          
+          cardBody.append(cardmeetingId);
+          cardBody.append(cardTitle);
+          cardBody.append(cardSubtitle);
+          cardBody.append(cardlocation);
+          cardBody.append(cardText);
+          cardBody.append(cardLink);
+          card.append(cardBody);
+  
+          meetingsList.append(card);
+        });
+      }
+    });    
+  </script>
+  
+{% endblock %}

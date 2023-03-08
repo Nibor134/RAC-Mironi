@@ -3,6 +3,7 @@ from flask import Flask, request, jsonify, Blueprint, session, redirect, render_
 from flask_cors import CORS
 import datetime
 import sqlite3
+import socket
 
 teacher = Blueprint('teacher', __name__)
 
@@ -46,28 +47,43 @@ def view_classes():
 @teacher.route('/aanwezigheid', methods=['GET', 'POST'])
 def attendance():
     if 'teacher_logged_in' in session:
+        print(session)
         return render_template('aanwezigheid.html')
     else:
         flash('Log alstublieft eerst in', 'danger')
         return redirect(url_for('login'))
 
-@teacher.route('/meetings/<int:meeting_id>')
+@teacher.route('/meetings/<int:meeting_id>')   
 def meeting(meeting_id):
-    
-    # Connect to the database
-    conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
-    c = conn.cursor()
+    if 'teacher_logged_in' in session: 
+        hostname = socket.gethostname()
 
-    # Retrieve the meeting with the requested ID from the database
-    c.execute('SELECT * FROM Meeting WHERE Meeting_id = ?', (meeting_id,))
-    meeting = c.fetchone()
+        ip_address = socket.gethostbyname(hostname)
+        ip_str = str(ip_address)
+        
 
-    # Close the database connection
-    conn.close()
+        # Connect to the database
+        conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
+        c = conn.cursor()
 
-    # Render the meeting template with the meeting data
-    return render_template('meetings.html', meeting=meeting)
+        # Retrieve the meeting with the requested ID from the database
+        c.execute('SELECT * FROM Meeting WHERE Meeting_id = ?', (meeting_id,))
+        meeting = c.fetchone()
+        print(meeting[10])
 
+        # Retrieve the class name using the class_id from the meeting
+        c.execute('SELECT classname FROM Class WHERE Class_id = ?', (meeting[10],))
+        class_name = c.fetchone()[0]
+        # Close the database connection
+        
+        c.execute('SELECT faculty_name FROM faculty WHERE faculty_email = ?', (session['username'],))
+        name = c.fetchone()[0]
+        conn.close()
+        # Render the meeting template with the meeting data
+        return render_template('meetings.html', meeting=meeting, ip_str=ip_str, meeting_id=meeting_id, class_name=class_name, name=name )
+    else:
+        flash('Log alstublieft eerst in', 'danger')
+    return redirect(url_for('login'))
 
 @teacher.route('/create_meeting')
 def make_meeting():
@@ -77,3 +93,7 @@ def make_meeting():
 @teacher.route('/teacher/upcoming_meetings')
 def t_upcoming_meetings():
     return render_template('teacher_upcoming_meetings.html')
+
+@teacher.route('/teacher/all_meetings')
+def t_all_meetings():
+    return render_template('teacher_all_meetings.html')
