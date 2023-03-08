@@ -426,6 +426,7 @@ def api_checkin(student, meeting):
 
     meeting_query = c.execute('SELECT * FROM Meeting WHERE Meeting_id = ? AND Meeting_date = ?', (meeting, attendance_date,))
     meeting_data = meeting_query.fetchone()
+    print(meeting_data[10])
 
     if not meeting_data:
         conn.close()
@@ -443,7 +444,7 @@ def api_checkin(student, meeting):
         attendance_query = c.execute('SELECT * FROM Attendance WHERE Meeting_id = ?', (meeting,))
         attendance_data = attendance_query.fetchall()
         attendance_students = set(row[1] for row in attendance_data if row[5] != 'afwezig')
-        students_query = c.execute('SELECT * FROM Students')
+        students_query = c.execute('SELECT * FROM Students WHERE Class_id = ?', (meeting_data[10],))
         students_data = students_query.fetchall()
         
         for student_data in students_data:
@@ -732,14 +733,15 @@ def create_meeting():
         created_by = data.get('created_by')
         created_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         class_id = data.get('class_id')
+        
 
         # Connect to the database
         conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
         c = conn.cursor()
 
         # Add the new meeting to the database
-        c.execute('INSERT INTO Meeting (Meeting_title, Meeting_date, Meeting_time, Meeting_duration, Meeting_location, Meeting_description, Class_id) VALUES (?, ?, ?, ?, ?, ?, ?)', 
-                        (meeting_title, meeting_date, meeting_time, meeting_duration, meeting_location, meeting_description, class_id))
+        c.execute('INSERT INTO Meeting (Meeting_title, Meeting_date, Meeting_time, Meeting_duration, Meeting_location, Meeting_description, Class_id, meeting_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', 
+                        (meeting_title, meeting_date, meeting_time, meeting_duration, meeting_location, meeting_description, class_id, 'open',))
 
         # Retrieve the ID of the newly created meeting
         meeting_id = c.lastrowid
@@ -750,6 +752,25 @@ def create_meeting():
 
         # Return the meeting ID in the response
         return jsonify({'message': 'Meeting created successfully.', 'meeting_id': meeting_id})
+
+@students_api.route('/api/close-meeting/<int:meeting>', methods=['POST'])
+def api_close_meeting(meeting):
+    # Check if the meeting exists
+    conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
+    c = conn.cursor()
+    meeting_query = c.execute('SELECT * FROM Meeting WHERE Meeting_id = ?', (meeting,))
+    meeting_data = meeting_query.fetchone()
+    if not meeting_data:
+        conn.close()
+        return jsonify({'error': f'Meeting {meeting} not found'}), 404
+
+    # Update the meeting status to 'closed'
+    c.execute('UPDATE Meeting SET meeting_status = ? WHERE Meeting_id = ?', ('closed', meeting))
+    conn.commit()
+    conn.close()
+
+    return jsonify({'message': f'Meeting {meeting} closed'}), 200
+
 
 #Delete meeting row
 @students_api.route('/api/meetings/<int:meeting_id>', methods=['DELETE'])
