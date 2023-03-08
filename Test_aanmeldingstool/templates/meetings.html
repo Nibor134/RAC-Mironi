@@ -89,25 +89,29 @@ function getAttendance() {
   });
 }
 
+
 $(document).ready(function() {
   var meeting_id = $('#close-meeting-btn').data('meeting-id');
+  var meeting_status = '{{ meeting[11] }}';
   
-  $('#close-meeting-btn').click(function() {
-    $.ajax({
-      url: '/api/close-meeting/{{ meeting_id }}',
-      type: 'POST',
-      success: function(data) {
-        
-        alert('Meeting closed successfully!');
-        window.location.href = '{{ url_for("teacher_dashboard") }}';
-      },
-      error: function(jqXHR, textStatus, errorThrown) {
-        alert('Error closing meeting: ' + textStatus);
-      }
+  if (meeting_status == 'closed') {
+    $('#close-meeting-btn').replaceWith('<p>Meeting is gesloten</p>');
+  } else {
+    $('#close-meeting-btn').click(function() {
+      $.ajax({
+        url: '/api/close-meeting/{{ meeting_id }}',
+        type: 'POST',
+        success: function(data) {
+          alert('Meeting is gesloten!');
+          location.reload();
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+          alert('Error sluiten meeting: ' + textStatus);
+        }
+      });
     });
-  });
+  }
 });
-
 
 $(document).ready(function() {
   getAttendance();

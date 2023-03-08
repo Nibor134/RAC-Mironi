@@ -425,61 +425,49 @@ def api_checkin(student, meeting):
         conn.close()
         return jsonify({'error': f'Student {student} not found'}), 404
 
-    meeting_query = c.execute('SELECT * FROM Meeting WHERE Meeting_id = ? AND Meeting_date = ? AND Meeting_status = ?', (meeting, attendance_date, 'open'))
+    meeting_query = c.execute('SELECT * FROM Meeting WHERE Meeting_id = ? AND Meeting_date = ?', (meeting, attendance_date))
     meeting_data = meeting_query.fetchone()
     print(meeting_data)
 
     if not meeting_data:
         conn.close()
         return jsonify({'error': f'Meeting {meeting} not found'}), 404
-    
-    if meeting_data[11] != 'open':
-        conn.close()
-        return jsonify({'error': f'Meeting {meeting} is not open'}), 403
 
+    if meeting_data[11] != 'open' and meeting_data[11] != 'closed':
+        conn.close()
+        return jsonify({'error': f'Meeting {meeting} is not open or closed'}), 403
+
+    if meeting_data[11] == 'closed':
+        conn.close()
+        return jsonify({'error': f'Check-in for meeting {meeting} has closed'}), 403
     
-    # Extract the meeting time from the database
+     # Extract the meeting time from the database
     meeting_time = meeting_data[3] 
     current_time = datetime.now(amsterdam_tz).strftime('%H:%M')
 
     # Check if the current time is between 10 minutes before and 20 minutes after the meeting time
     checkin_open = datetime.strptime(current_time, '%H:%M') >= datetime.strptime(meeting_time, '%H:%M') - timedelta(minutes=10) \
-                   and datetime.strptime(current_time, '%H:%M') <= datetime.strptime(meeting_time, '%H:%M') + timedelta(minutes=1)
-    if not checkin_open:
-        # Check-in has closed, get list of all students who have not checked in and are not already marked as absent
-        attendance_query = c.execute('SELECT * FROM Attendance WHERE Meeting_id = ?', (meeting,))
-        attendance_data = attendance_query.fetchall()
-        attendance_students = set(row[1] for row in attendance_data if row[5] != 'afwezig')
-        students_query = c.execute('SELECT * FROM Students WHERE Class_id = ?', (meeting_data[10],))
-        students_data = students_query.fetchall()
-        
-        for student_data in students_data:
-            if student_data[5] not in attendance_students:
-                # Check if the student is already marked as absent or present
-                existing_query = c.execute('SELECT * FROM Attendance WHERE Meeting_id = ? AND Studentnumber = ?', (meeting, student_data[5],))
-                existing_data = existing_query.fetchone()
-                if not existing_data:
-                    # Insert new attendance record for this student with status set to 'afwezig'
-                    c.execute('INSERT INTO Attendance (Studentnumber, Student_id, Meeting_id, Attendance_date, Attendance_time, Status, Question, Answer, Reason) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                            (student_data[5], student_data[0], meeting, attendance_date, attendance_time, 'Afwezig', None, None, None,))
+                and datetime.strptime(current_time, '%H:%M') <= datetime.strptime(meeting_time, '%H:%M') + timedelta(minutes=1)
+
+    if checkin_open:
+        # Check if student is already checked in
+        attendance_query = c.execute('SELECT * FROM Attendance WHERE Studentnumber LIKE ? AND Meeting_id = ?', (str(student), meeting))
+        attendance_data = attendance_query.fetchone()
+        if attendance_data:
+            conn.close()
+            return jsonify({'error': f'Student {student} is already checked in to meeting {meeting}'}), 400
+
+        # Add the attendance record
+        c.execute('INSERT INTO Attendance (Student_id, Studentnumber, Meeting_id, Attendance_date, Attendance_time, Status, Question, Answer, Reason) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                (student_data[0], student, meeting, attendance_date, attendance_time, status, question, answer, reason,))
         conn.commit()
         conn.close()
-        return jsonify({'error': f'Check-in for meeting {meeting} has closed'}), 403
-    
-    # Check if student is already
-    attendance_query = c.execute('SELECT * FROM Attendance WHERE Studentnumber LIKE ? AND Meeting_id = ?', (str(student), meeting))
-    attendance_data = attendance_query.fetchone()
-    if attendance_data:
+
+        return jsonify({'message': f'Student {student} checked in to meeting {meeting} successfully'}), 200
+    else:
         conn.close()
-        return jsonify({'error': f'Student {student} is already checked in to meeting {meeting}'}), 400
+        return jsonify({'error': f'Check-in for meeting {meeting} is closed'}), 403
 
-    # Add the attendance record
-    c.execute('INSERT INTO Attendance (Student_id, Studentnumber, Meeting_id, Attendance_date, Attendance_time, Status, Question, Answer, Reason) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            (student_data[0], student, meeting, attendance_date, attendance_time, status, question, answer, reason,))
-    conn.commit()
-    conn.close()
-
-    return jsonify({'message': f'Student {student} checked in to meeting {meeting} successfully'}), 200
 
 
 #@students_api.route('/api/checkin/<int:student>/<int:meeting>', methods=['POST'])
@@ -764,12 +752,31 @@ def api_close_meeting(meeting):
     # Check if the meeting exists
     conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
     c = conn.cursor()
+    attendance_date = datetime.now().strftime('%Y-%m-%d')
+    attendance_time = datetime.now().strftime('%H:%M:%S')
     meeting_query = c.execute('SELECT * FROM Meeting WHERE Meeting_id = ?', (meeting,))
     meeting_data = meeting_query.fetchone()
     if not meeting_data:
         conn.close()
         return jsonify({'error': f'Meeting {meeting} not found'}), 404
+        # Check-in has closed, get list of all students who have not checked in and are not already marked as absent
+    attendance_query = c.execute('SELECT * FROM Attendance WHERE Meeting_id = ?', (meeting,))
+    attendance_data = attendance_query.fetchall()
+    attendance_students = set(row[1] for row in attendance_data if row[5] != 'Afwezig')
+    students_query = c.execute('SELECT * FROM Students WHERE Class_id = ?', (meeting_data[10],))
+    students_data = students_query.fetchall()
+    
+    for student_data in students_data:
+        if student_data[5] not in attendance_students:
+            # Check if the student is already marked as absent or present
+            existing_query = c.execute('SELECT * FROM Attendance WHERE Meeting_id = ? AND Studentnumber = ?', (meeting, student_data[5],))
+            existing_data = existing_query.fetchone()
+            if not existing_data:
+                # Insert new attendance record for this student with status set to 'afwezig'
+                c.execute('INSERT INTO Attendance (Studentnumber, Student_id, Meeting_id, Attendance_date, Attendance_time, Status, Question, Answer, Reason) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                        (student_data[5], student_data[0], meeting, attendance_date, attendance_time, 'Afwezig', None, None, None,))
 
+        
     # Update the meeting status to 'closed'
     c.execute('UPDATE Meeting SET meeting_status = ? WHERE Meeting_id = ?', ('closed', meeting))
     conn.commit()
