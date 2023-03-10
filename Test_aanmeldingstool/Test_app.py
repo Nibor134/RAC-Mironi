@@ -43,8 +43,10 @@ def student_dashboard():
 @app.route('/teacher_dashboard')
 def teacher_dashboard():
     if 'teacher_logged_in' in session:
+        c.execute('SELECT faculty_name FROM faculty WHERE faculty_email = ?', (session['username'],))
         teacher_id = session.get('user_id')
-        return render_template('teacher_dashboard.html',)
+        name_t = c.fetchone()[0]
+        return render_template('teacher_dashboard.html', name_t=name_t)
     else:
         flash('Ongeldige inloggegevens.', 'danger')
         return redirect(url_for('login'))
