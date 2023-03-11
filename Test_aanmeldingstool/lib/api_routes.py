@@ -645,6 +645,78 @@ def get_attendance_v2():
 
     return jsonify({'attendance': attendance})
 
+@students_api.route('/api/average_attendance', methods=['GET'])
+def get_average_attendance():
+    conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
+    cursor = conn.cursor()
+
+    # Retrieve attendance records from the database
+    cursor.execute('SELECT Attendance.Meeting_id, Attendance.Status, Students.class_id FROM Students INNER JOIN Attendance ON Students.Student_id=Attendance.Student_id WHERE Attendance.Meeting_id IN (SELECT DISTINCT Meeting_id FROM Attendance ORDER BY Attendance_date DESC LIMIT 10)')
+    rows = cursor.fetchall()
+
+    # Calculate attendance counts by meeting_id and class_id
+    meeting_attendance = {}  # dictionary to store attendance counts by meeting_id
+    class_sizes = {}  # dictionary to store class sizes by class_id
+    for row in rows:
+        status = row[1]
+        meeting_id = row[0]
+        class_id = row[2]
+        
+        # Update attendance count for this meeting_id
+        if meeting_id in meeting_attendance:
+            meeting_attendance[meeting_id]['total'] += 1
+            if status == 'Aanwezig':
+                meeting_attendance[meeting_id]['attended'] += 1
+        else:
+            meeting_attendance[meeting_id] = {
+                'total': 1,
+                'attended': 1 if status == 'Aanwezig' else 0
+            }
+        
+        # Update class size for this class_id
+        if class_id in class_sizes:
+            class_sizes[class_id] += 1
+        else:
+            class_sizes[class_id] = 1
+    
+    # Calculate average attendance by meeting_id
+    average_attendance = {}
+    for meeting_id, counts in meeting_attendance.items():
+        total_attendance = counts['total']
+        attended_attendance = counts['attended']
+        average_attendance[meeting_id] = attended_attendance / total_attendance
+    
+    # Get class sizes
+    cursor = conn.cursor()
+    cursor.execute('SELECT class_id, COUNT(*) FROM Students GROUP BY class_id')
+    rows = cursor.fetchall()
+    for row in rows:
+        class_id = row[0]
+        size = row[1]
+        class_sizes[class_id] = size
+    
+    conn.close()
+    
+    # Convert dictionaries to arrays for use by Charts.JS
+    meeting_data = []
+    for meeting_id, avg_attendance in average_attendance.items():
+        meeting_data.append({
+            'meeting_id': meeting_id,
+            'avg_attendance': avg_attendance
+        })
+    
+    class_data = []
+    for class_id, size in class_sizes.items():
+        class_data.append({
+            'class_id': class_id,
+            'size': size
+        })
+    
+    return jsonify({
+        'meeting_data': meeting_data,
+        'class_data': class_data
+    })
+
 
 @students_api.route('/api/attendance', methods=['GET'])
 def get_attendance():
