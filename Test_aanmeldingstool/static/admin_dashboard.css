@@ -25,11 +25,11 @@ nav .container-fluid {
 
 nav {
     background-color: transparent;
-    color: black;
+    color: #001e48;
 }
 
 .nav-link {
-    color: black;
+    color: #001e48;
 }
 
 .logo {
@@ -46,28 +46,26 @@ nav {
     background-color: transparent;
     border-radius: 20px;
     transition: 0.3s;
+    padding-left: 5px;
 }
 
-/* .button:hover {
-    background-color: white;
-} */
-
 .CloseButton {
-    font-size: 50px;
+    font-size: 45px;
     cursor: pointer;
     padding-left: 25px;
     color: white;
-    position: absolute;
     top: 0px;
+    padding-top: 5px;
+    padding-left: 320px;
 }
 .sidenav {
     height: 100%;
     width: 0;
     position: fixed;
-    z-index: 1;
+    z-index: 5;
     top: 0;
     right: 0;
-    background-color: #111;
+    background-color: #3caad7;
     overflow-x: hidden;
     transition: 0.5s;
     padding-top: 60px;
@@ -76,14 +74,15 @@ nav {
 .sidenav a {
     padding: 8px 8px 8px 32px;
     text-decoration: none;
-    font-size: 25px;
-    color: #818181;
+    font-size: 17px;
+    color: white;
     display: block;
     transition: 0.3s;
 }
     
 .sidenav a:hover {
     color: #f1f1f1;
+    background-color: #03506F;
 }
     
 .sidenav .closebtn {
@@ -98,8 +97,17 @@ nav {
     transition: margin-right .5s;
     padding: 16px;
 }
+
+.body_sidenav {
+    padding-top: 20px;
+}
     
 @media screen and (max-height: 450px) {
    .sidenav {padding-top: 15px;}
    .sidenav a {font-size: 18px;}
+}
+
+.logout:hover {
+    background-color: transparent!important;
+    text-decoration: underline;
 }
