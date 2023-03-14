@@ -17,7 +17,7 @@
 		<div class="container-fluid">
 			<ul class="navbar-nav ml-auto">
 				<li class="nav-item d-flex">
-					<a class="navbar-brand logo_button" href="#"><img class="logo" src="static/images/logo.svg" name="HomeButton" action="/main"></a>
+					<a class="navbar-brand logo_button" href="{{ url_for('admin_dashboard') }}"><img class="logo" src="static/images/logo.svg" name="HomeButton" action="/main"></a>
 				</li>
 				<li class="nav-item d-flex align-items-center">
 					<div>Dashboard</div>
@@ -92,10 +92,10 @@
 				</svg>
 				Cursus
 			</a>
-			<a href="">Inschrijvingen</a>
 			<a href="">Aanwezigheid</a>
 			<a href="">Faculteit</a>
-			<a href="">Lokalen</a>
+			<a href="">Meetings</a>
+			<a href="">Klassen</a>
 		</div>
 	</div>
 	<script>
@@ -109,7 +109,6 @@
 			document.getElementById("mySidenav").style.width = "0";
 			document.getElementById("main").style.marginRight = "0";
 			document.body.style.backgroundColor = "#fff7ea";
-			
 		}
 	</script>
 </body>
