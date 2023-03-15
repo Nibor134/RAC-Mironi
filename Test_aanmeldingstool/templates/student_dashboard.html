@@ -6,57 +6,5 @@
     <script src="https://code.jquery.com/jquery-3.6.2.js"></script>
   </head>
 <body>
-  <div class="container mt-5">
-    <h1 class="text-center mb-4">Welkom  {{name_s}}!</h1>
-      <h1 class="text-center mb-4">Rooster</h1>
-      <table class="table table-striped">
-          <thead>
-              <tr>
-                  <th>Vak</th>
-                  <th>Faculteit</th>
-                  <th>Lokaal</th>
-                  <th>Start Tijd</th>
-                  <th>Eind Tijd</th>
-                  <th>Dag</th>
-              </tr>
-          </thead>
-          <tbody id="schedule">
-          </tbody>
-      </table>
-  </div>
-  {% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-    {% for category, message in messages %}
-      <div class="alert alert-{{ category }}">
-        {{ message }}
-      </div>
-    {% endfor %}
-  {% endif %}
-{% endwith %}
-  <script>
-    $(document).ready(function() {
-        $.ajax({
-            url: '/api/schedule',
-            method: 'GET',
-            success: function(data) {
-                var schedule = $('#schedule');
-                schedule.empty();
-                $.each(data, function(index, schedule_item) {
-                    var row = $('<tr>');
-                    row.append($('<td>').text(schedule_item['course_id']));
-                    row.append($('<td>').text(schedule_item['faculty_id']));
-                    row.append($('<td>').text(schedule_item['room_id']));
-                    row.append($('<td>').text(schedule_item['start_time']));
-                    row.append($('<td>').text(schedule_item['end_time']));
-                    row.append($('<td>').text(schedule_item['days']));
-                    schedule.append(row);
-                });
-            },
-            error: function() {
-                alert('Failed to retrieve schedule data');
-            }
-        });
-    });
-</script>
 </body>
 {% endblock %}
