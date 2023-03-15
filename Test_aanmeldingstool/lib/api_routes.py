@@ -724,7 +724,7 @@ def get_attendance():
     cursor = conn.cursor()
 
     # Retrieve attendance records from the database
-    cursor.execute('SELECT Students.student_name, Students.studentnumber, Attendance.Attendance_date, Attendance.Attendance_time, Attendance.Status, Attendance.Meeting_id, Students.class_id FROM Students INNER JOIN Attendance ON Students.Student_id=Attendance.Student_id')
+    cursor.execute('SELECT Students.student_name, Students.studentnumber, Attendance.Attendance_date, Attendance.Attendance_time, Attendance.Status, Attendance.Meeting_id, Students.class_id, Attendance.question, Attendance.answer, Attendance.reason FROM Students INNER JOIN Attendance ON Students.Student_id=Attendance.Student_id')
     rows = cursor.fetchall()
 
     # Convert the records into a list of dictionaries
@@ -736,12 +736,16 @@ def get_attendance():
             'date': row[2],
             'time': row[3],
             'status': row[4],
-            'Meeting_id':row[5],
-            'class_id': row[6]
+            'Meeting_id': row[5],
+            'class_id': row[6],
+            'question': row[7],
+            'answer': row[8],
+            'reason': row[9]
         })
     conn.close()
 
     return jsonify({'attendance': attendance})
+
 
 @students_api.route('/api/attendance/<int:attendance_id>', methods=['DELETE'])
 def delete_attendance(attendance_id):
