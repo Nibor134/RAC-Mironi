@@ -902,6 +902,47 @@ def delete_all_meetings():
     # Return a success message
     return jsonify({'message': f'Attendance records with IDs between {start_id} and {end_id} deleted successfully.'})
 
+@students_api.route('/api/students/delete_all', methods=['DELETE'])
+def delete_all_students():
+    # Get the range of attendance IDs to delete from the request body
+    data = request.json
+    start_id = data.get('start_id')
+    end_id = data.get('end_id')
+    
+    if not start_id or not end_id:
+        return jsonify({'error': 'Start and end IDs not provided in request body.'}), 400
+
+    # Connect to the database
+    conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
+    c = conn.cursor()
+
+    # Delete the attendance records with the given range of IDs
+    c.execute('DELETE FROM Students WHERE Student_id >= ? AND Student_id <= ?', (start_id, end_id))
+
+    # Commit the changes and close the database connection
+    conn.commit()
+    conn.close()
+
+    # Return a success message
+    return jsonify({'message': f'Attendance records with IDs between {start_id} and {end_id} deleted successfully.'})
+
+
+@students_api.route('/api/students/insert', methods=['POST'])
+def insert_students():
+    
+    students = request.get_json()
+    if not students:
+        return jsonify({'message': 'No data provided'}), 400
+
+    conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
+    c = conn.cursor()
+
+    for student in students:
+        c.execute("INSERT INTO students (class_id, other_details, Studentnumber, Student_name, Username, Password) VALUES (?, ?, ?, ?, ?, ?)",
+                       (student['class_id'], student['other_details'], student['Studentnumber'], student['Student_name'], student['Username'], student['Password']))
+    conn.commit()
+    return jsonify({'message': 'Students inserted successfully'}), 201
+
 @students_api.route('/api/all_meetings', methods=['GET'])
 def get_meetings():
     # Connect to the database
