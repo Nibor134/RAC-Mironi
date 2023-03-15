@@ -31,11 +31,11 @@ def index():
 
 # Student dashboard
 @app.route('/student_dashboard')
-def student_dashboard():
+def student_dashboard(events=[]):
     if 'student_logged_in' in session:
         c.execute('SELECT student_name FROM Students WHERE Studentnumber = ?', (session['username'],))
         name_s = c.fetchone()[0]
-        return render_template('student_dashboard.html', name_s=name_s)
+        return render_template('student_dashboard.html', name_s=name_s, events=events)
     else:
         flash('Ongeldige inloggegevens.', 'danger')
         return redirect(url_for('login'))
@@ -74,9 +74,9 @@ def get_teacher_by_email(email):
         return None
 
 def get_admin_by_username(username):
-    conn = sqlite3.connect('Test_aanmeldingstool/databases/test_database2.db')
+    conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
     c = conn.cursor()
-    c.execute('SELECT * FROM Users WHERE username = ?', (username,))
+    c.execute('SELECT username, password FROM admin WHERE username = ?', (username,))
     admin = c.fetchone()
     conn.close()
     if admin:
@@ -145,7 +145,7 @@ def login():
                 session['admin_logged_in'] = True
                 session['username'] = admin['username']
                 flash('You were successfully logged in!', 'success')
-                return redirect(url_for('admin_dashboard'))
+                return redirect(url_for('admin'))
             else:
                 flash('Ongeldige inloggegevens.', 'danger')
                 return redirect(url_for('login'))
