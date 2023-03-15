@@ -29,16 +29,6 @@ FLASK_DEBUG = True
 def index():
     return render_template('login_test.html')
 
-# Student dashboard
-@app.route('/student_dashboard')
-def student_dashboard(events=[]):
-    if 'student_logged_in' in session:
-        c.execute('SELECT student_name FROM Students WHERE Studentnumber = ?', (session['username'],))
-        name_s = c.fetchone()[0]
-        return render_template('student_dashboard.html', name_s=name_s, events=events)
-    else:
-        flash('Ongeldige inloggegevens.', 'danger')
-        return redirect(url_for('login'))
 
 @app.route('/teacher_dashboard')
 def teacher_dashboard():
@@ -180,7 +170,7 @@ def admin():
 @app.route('/logout')
 def logout():
     session.clear()
-    flash('You have been logged out.', 'info')
+    flash('Je bent uitgelogd.', 'info')
     return redirect(url_for('login'))
 
 if __name__ == "__main__":
