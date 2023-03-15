@@ -117,8 +117,12 @@ def s_upcoming_meetings():
 @student_route.route('/checkin/<int:meeting_id>', methods=['GET'])
 def check_in(meeting_id):
     if 'student_logged_in' in session:
-        print(session)
-        return render_template('checkin2.html', meeting_id=meeting_id)
+        conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
+        c = conn.cursor()
+        c.execute('SELECT question FROM Meeting WHERE Meeting_id = ?', (meeting_id,))
+        question = c.fetchone()[0]
+        print(question)
+        return render_template('checkin2.html', meeting_id=meeting_id, question=question)
     else:
         flash('Log alstublieft eerst in', 'danger')
         return redirect(url_for('login_for_redirect', meeting_id=meeting_id))

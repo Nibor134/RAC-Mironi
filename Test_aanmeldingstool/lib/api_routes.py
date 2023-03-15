@@ -409,6 +409,7 @@ def api_delete_schedule(schedule_id):
 @students_api.route('/api/checkin/<int:student>/<int:meeting>', methods=['POST'])
 def api_checkin(student, meeting):
     data = request.json
+    student = str(student).zfill(7)
     attendance_date = datetime.now().strftime('%Y-%m-%d')
     attendance_time = datetime.now().strftime('%H:%M:%S')
     status = data.get('status')
@@ -660,6 +661,7 @@ def create_meeting():
         meeting_duration = data.get('duration')
         meeting_location = data.get('location')
         meeting_description = data.get('description')
+        meeting_question = data.get('question')
         created_by = data.get('created_by')
         created_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         class_id = data.get('class_id')
@@ -670,8 +672,8 @@ def create_meeting():
         c = conn.cursor()
 
         # Add the new meeting to the database
-        c.execute('INSERT INTO Meeting (Meeting_title, Meeting_date, Meeting_time, Meeting_duration, Meeting_location, Meeting_description, Class_id, meeting_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', 
-                        (meeting_title, meeting_date, meeting_time, meeting_duration, meeting_location, meeting_description, class_id, 'open',))
+        c.execute('INSERT INTO Meeting (Meeting_title, Meeting_date, Meeting_time, Meeting_duration, Meeting_location, Meeting_description, Class_id, meeting_status, Question) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', 
+                        (meeting_title, meeting_date, meeting_time, meeting_duration, meeting_location, meeting_description, class_id, 'open', meeting_question))
 
         # Retrieve the ID of the newly created meeting
         meeting_id = c.lastrowid
