@@ -965,3 +965,117 @@ def get_meetings():
 @students_api.route('/api/getmeetings', methods=['GET'])
 def api_getmeetings():
     return jsonify(get_meetings())
+
+# #Admin API - Class
+# def insert_class(klas):
+#     inserted_class = {}
+#     try:
+#         conn = connect_to_db()
+#         cur = conn.cursor()
+#         cur.execute("INSERT INTO Class (class_id, classname VALUES (?, ?)", (klas['class_id'], klas['classname']) )
+#         conn.commit()
+#         inserted_class = get_class_by_id(cur.lastrowid)
+#     except:
+#         conn().rollback()
+
+#     finally:
+#         conn.close()
+
+#     return inserted_class
+
+# def get_class():
+#     klas = []
+#     try:
+#         conn = connect_to_db()
+#         conn.row_factory = sqlite3.Row
+#         cur = conn.cursor()
+#         cur.execute("SELECT * FROM Class")
+#         rows = cur.fetchall()
+
+#         # convert row objects to dictionary
+#         for i in rows:
+#             klas = {}
+#             klas["class_id"] = i["class_id"]
+#             klas["classname"] = i["classname"]
+#             klas.append(klas)
+
+#     except:
+#         klas = []
+
+#     return klas
+
+
+# def get_class_by_id(class_id):
+#     klas = {}
+#     try:
+#         conn = connect_to_db()
+#         conn.row_factory = sqlite3.Row
+#         cur = conn.cursor()
+#         cur.execute("SELECT * FROM Class WHERE class_id = ?", 
+#                        (class_id,))
+#         row = cur.fetchone()
+
+#         # convert row object to dictionary
+#         klas["class_id"] = row["class_id"]
+#         klas["classname"] = row["classname"]
+#     except:
+#         klas = {}
+
+#     return klas
+
+# def update_class(klas):
+#     updated_class = {}
+#     try:
+#         conn = connect_to_db()
+#         cur = conn.cursor()
+#         cur.execute("UPDATE Class SET classname = ? WHERE class_id =?",  
+#                      (klas["classname"], klas["class_id"],))
+#         conn.commit()
+#         #return the user
+#         updated_class = get_class_by_id(klas["class_id"])
+
+#     except:
+#         conn.rollback()
+#         updated_class = {}
+#     finally:
+#         conn.close()
+
+#     return updated_class
+
+# def delete_class(class_id):
+#     message = {}
+#     try:
+#         conn = connect_to_db()
+#         conn.execute("DELETE from Class WHERE class_id = ?",     
+#                       (class_id,))
+#         conn.commit()
+#         message["status"] = "User deleted successfully"
+#     except:
+#         conn.rollback()
+#         message["status"] = "Cannot delete user"
+#     finally:
+#         conn.close()
+
+#     return message
+
+# @students_api.route('/api/class', methods=['GET'])
+# def api_get_class():
+#     return jsonify(get_class())
+
+# @students_api.route('/api/class/<class_id>', methods=['GET'])
+# def api_get_class(class_id):
+#     return jsonify(get_class_by_id(class_id))
+
+# @students_api.route('/api/class/add',  methods = ['POST'])
+# def api_add_class():
+#     klas = request.get_json()
+#     return jsonify(insert_class(klas))
+
+# @students_api.route('/api/class/update',  methods = ['PUT'])
+# def api_update_class():
+#     klas = request.get_json()
+#     return jsonify(update_class(klas))
+
+# @students_api.route('/api/class/delete/<class_id>',  methods = ['DELETE'])
+# def api_delete_class(class_id):
+#     return jsonify(delete_class(class_id))

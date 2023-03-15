@@ -17,7 +17,7 @@
 		<div class="container-fluid">
 			<ul class="navbar-nav ml-auto">
 				<li class="nav-item d-flex">
-					<a class="navbar-brand logo_button" href="{{ url_for('admin_dashboard') }}"><img class="logo" src="static/images/logo.svg" name="HomeButton" action="/main"></a>
+					<a class="navbar-brand logo_button" href="{{ url_for('admin') }}"><img class="logo" src="static/images/logo.svg" name="HomeButton" action="/main"></a>
 				</li>
 				<li class="nav-item d-flex align-items-center">
 					<div>Dashboard</div>
@@ -98,6 +98,16 @@
 			<a href="">Klassen</a>
 		</div>
 	</div>
+
+	<div class="card bg-light mb-3" style="max-width: 18rem;">
+		<div class="card-header">Add Klas</div>
+		<div class="card-body">
+		  <p class="card-text">
+			Some quick example text to build on the card title and make up the bulk of the card's content.
+		</p>
+		</div>
+	  </div>
+
 	<script>
 		function openNav() {
 			document.getElementById("mySidenav").style.width = "500px";
