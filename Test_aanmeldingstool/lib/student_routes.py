@@ -47,6 +47,33 @@ def student_dashboard(events=[]):
         flash('Ongeldige inloggegevens.', 'danger')
         return redirect(url_for('login'))
 
+@student_route.route('/student_statistics')
+def student_statistics():
+    if 'student_logged_in' in session:
+     # Retrieve attendance records for the logged in student from the database
+        conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
+        cursor = conn.cursor()
+        cursor.execute('SELECT Students.student_name, Attendance.Status FROM Students INNER JOIN Attendance ON Students.Student_id=Attendance.Student_id WHERE Students.studentnumber = ?', (session['username'],))
+        rows = cursor.fetchall()
+
+        # Calculate attendance percentage for the logged in student
+        attendance_counts = {'Aanwezig': 0, 'Afwezig': 0}
+        for row in rows:
+            status = row[1]
+            if status in attendance_counts:
+                attendance_counts[status] += 1
+
+        total_records = len(rows)
+        attendance_percentage = round((attendance_counts['Aanwezig'] / total_records) * 100, 2)
+
+        return render_template('student_statistics.html', attendance_percentage=attendance_percentage)
+    
+    else:
+        flash('Ongeldige inloggegevens.', 'danger')
+        return redirect(url_for('login'))
+
+
+
 @student_route.route('/rooster')
 def rooster():
     if 'student_logged_in' in session:

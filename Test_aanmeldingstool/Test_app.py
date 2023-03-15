@@ -109,7 +109,7 @@ def login():
                 session['student_logged_in'] = True
                 session['username'] = str(student['studentnumber'])
                 flash('You were successfully logged in!', 'success')
-                return redirect(url_for('student_dashboard'))
+                return redirect(url_for('student_route.student_dashboard'))
             else:
                 flash('Ongeldige inloggegevens.', 'danger')
                 return redirect(url_for('login'))
