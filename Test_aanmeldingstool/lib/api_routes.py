@@ -846,7 +846,7 @@ def api_close_meeting(meeting):
             if not existing_data:
                 # Insert new attendance record for this student with status set to 'afwezig'
                 c.execute('INSERT INTO Attendance (Studentnumber, Student_id, Meeting_id, Attendance_date, Attendance_time, Status, Question, Answer, Reason) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                        (student_data[5], student_data[0], meeting, attendance_date, attendance_time, 'Afwezig', None, None, None,))
+                        (student_data[5], student_data[0], meeting, attendance_date, attendance_time, 'Afwezig', None, None, 'Niet in/uitgecheckt',))
 
         
     # Update the meeting status to 'closed'
