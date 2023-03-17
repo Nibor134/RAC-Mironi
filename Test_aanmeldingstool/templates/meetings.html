@@ -82,9 +82,9 @@
       function getClassName(class_id) {
         var class_names = {
           1: "SWDVT1A",
-          2: "SWDVT2A",
-          3: "SWDVT3A",
-          4: "SWDVT4A",
+          2: "SWDVT1B",
+          3: "SWDVT1C",
+          4: "SWDVT1D",
         };
         return class_names[class_id];
       }
@@ -129,7 +129,7 @@ $(document).ready(function() {
           location.reload();
         },
         error: function(jqXHR, textStatus, errorThrown) {
-          alert('Error sluiten meeting: ' + textStatus);
+          alert('Er is een fout opgetreden bij het sluiten meeting: ' + textStatus);
         }
       });
     });
