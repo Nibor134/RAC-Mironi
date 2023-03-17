@@ -54,7 +54,6 @@
           <tr>
             <th scope="col">Datum</th>
             <th scope="col">Tijd</th>
-            <th scope="col">Naam</th>
             <th scope="col">Studentnummer</th>
             <th scope="col">Status</th>
             <th scope="col">Klas</th>
@@ -90,7 +89,6 @@
             var row = $('<tr></tr>');
             row.append($('<td></td>').text(item.date));
             row.append($('<td></td>').text(item.time));
-            row.append($('<td></td>').text(item.student_name));
             row.append($('<td></td>').text(item.studentnumber));
             var statusColumn = $('<td></td>').text(item.status);
             if (item.status === 'Aanwezig') {
