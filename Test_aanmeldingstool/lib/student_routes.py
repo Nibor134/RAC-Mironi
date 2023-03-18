@@ -121,7 +121,6 @@ def check_in(meeting_id):
         c = conn.cursor()
         c.execute('SELECT question FROM Meeting WHERE Meeting_id = ?', (meeting_id,))
         question = c.fetchone()[0]
-        print(question)
         return render_template('checkin2.html', meeting_id=meeting_id, question=question)
     else:
         flash('Log alstublieft eerst in', 'danger')

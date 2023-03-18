@@ -424,7 +424,7 @@ def api_checkin(student, meeting):
     student_data = student_query.fetchone()
     if not student_data:
         conn.close()
-        return jsonify({'error': f'Student {student} not found'}), 404
+        return jsonify({'error': f'Student {student} niet gevonden'}), 404
 
     meeting_query = c.execute('SELECT * FROM Meeting WHERE Meeting_id = ? AND Meeting_date = ?', (meeting, attendance_date))
     meeting_data = meeting_query.fetchone()
@@ -432,15 +432,15 @@ def api_checkin(student, meeting):
 
     if not meeting_data:
         conn.close()
-        return jsonify({'error': f'Meeting {meeting} not found'}), 404
+        return jsonify({'error': f'Meeting {meeting} niet gevonden'}), 404
 
     if meeting_data[11] != 'open' and meeting_data[11] != 'closed':
         conn.close()
-        return jsonify({'error': f'Meeting {meeting} is not open or closed'}), 403
+        return jsonify({'error': f'Meeting {meeting} is niet open of gesloten'}), 403
 
     if meeting_data[11] == 'closed':
         conn.close()
-        return jsonify({'error': f'Check-in for meeting {meeting} has closed'}), 403
+        return jsonify({'error': f'Check-in voor meeting {meeting} is gesloten'}), 403
     
      # Extract the meeting time from the database
     meeting_time = meeting_data[3] 
@@ -456,7 +456,7 @@ def api_checkin(student, meeting):
         attendance_data = attendance_query.fetchone()
         if attendance_data:
             conn.close()
-            return jsonify({'error': f'Student {student} is already checked in to meeting {meeting}'}), 400
+            return jsonify({'error': f'Student {student} is al ingecheckt voor meeting {meeting}'}), 400
 
         # Add the attendance record
         c.execute('INSERT INTO Attendance (Student_id, Studentnumber, Meeting_id, Attendance_date, Attendance_time, Status, Question, Answer, Reason) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
@@ -464,10 +464,10 @@ def api_checkin(student, meeting):
         conn.commit()
         conn.close()
 
-        return jsonify({'message': f'Student {student} checked in to meeting {meeting} successfully'}), 200
+        return jsonify({'message': f'Student {student} is succesvol ingecheckt voor meeting {meeting}'}), 200
     else:
         conn.close()
-        return jsonify({'error': f'Check-in for meeting {meeting} is closed'}), 403
+        return jsonify({'error': f'Check-in voor meeting {meeting} is gesloten'}), 403
 
 
 
