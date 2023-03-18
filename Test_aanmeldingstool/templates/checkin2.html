@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='/login_mobile.css') }}">
 </head>
 <body>
-  
+  <h1><br></h1>
   <form id="checkin-form" method="POST">
     <h1>Student Check-In</h1>
     <input type="hidden" name="student-number" id="student-number" value="{{ session.username }}" required pattern="\d{6,8}">

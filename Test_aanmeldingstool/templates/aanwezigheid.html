@@ -9,7 +9,7 @@
   <div class="container">
     <h1>Aanwezigheid</h1>
     <div class="form-group">
-      <label for="student-number">Filter op studentnummer:</label>
+      <label for="student-number">Filter op studentnaam of studentnummer:</label>
       <input type="text" class="form-control" id="student-number">
     </div>
     <div id="attendance-table">
@@ -35,17 +35,17 @@
   </div>
 
   <script>
-    function getAttendance(studentNumber) {
-      $.get("/api/attendance", function(data) {
-        var attendance = data.attendance;
-        var tableBody = $('#attendance-table > tbody');
-        tableBody.empty();
-  
-        if (studentNumber) {
-          attendance = attendance.filter(function(item) {
-            return item.studentnumber === studentNumber;
-          });
-        }
+      function getAttendance(filterText) {
+        $.get("/api/attendance", function(data) {
+          var attendance = data.attendance;
+          var tableBody = $('#attendance-table > tbody');
+          tableBody.empty();
+
+          if (filterText) {
+            attendance = attendance.filter(function(item) {
+              return item.studentnumber === filterText || item.student_name.includes(filterText);
+            });
+          }
   
         attendance.forEach(function(item) {
           var row = $('<tr></tr>');
@@ -69,8 +69,8 @@
       getAttendance();
   
       $('#student-number').on('input', function() {
-        var studentNumber = $(this).val();
-        getAttendance(studentNumber);
+    var filterText = $(this).val();
+    getAttendance(filterText);
       });
     });
   
