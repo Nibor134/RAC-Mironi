@@ -1,5 +1,6 @@
-<!DOCTYPE html>
-<html>
+{% extends "base3.html" %}
+
+{% block content %}
 <head>
   <title>Student Check-In</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,14 +9,14 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='/login_mobile.css') }}">
 </head>
 <body>
-  <h1>Student Check-In</h1>
+  
   <form id="checkin-form" method="POST">
-    
+    <h1>Student Check-In</h1>
     <input type="hidden" name="student-number" id="student-number" value="{{ session.username }}" required pattern="\d{6,8}">
     <br>
     <input type="hidden" name="meeting-number" id="meeting-number" value="{{ meeting_id }}" required>
     <br>
-    
+
     <div class="mb-3">
       <label for="status" class="form-label">Status:</label>
       <select class="form-select" name="status" id="status" required>
@@ -95,4 +96,4 @@
       
   </script>
 </body>
-</html>
+{% endblock %}
