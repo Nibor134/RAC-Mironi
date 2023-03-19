@@ -5,7 +5,7 @@ conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
 c = conn.cursor()
 
 # Add the Meeting_id column to the Attendance table
-c.execute('ALTER TABLE Meeting ADD COLUMN class_id INTEGER REFERENCES Class(class_id)')
+c.execute('ALTER TABLE Meeting ADD COLUMN Question TEXT')
 
 # Commit the changes and close the database connection
 conn.commit()

@@ -12,6 +12,7 @@ html {
 body {
     background-color: #fff7ea;
     font-family: "Poppins", sans-serif;
+    padding-bottom: 80px;
     color: #001e48;
 }
 
@@ -53,7 +54,7 @@ form {
 .login_input {
     border: none;
     border-bottom: 2px solid #001e48;
-    width: 400px;
+    width: 350px;
     height: 40px;
     background-color: transparent;
     transition: 175ms ease-in-out;
@@ -124,3 +125,4 @@ footer .container {
     width: 10px;
     background: url(https://login.hr.nl/v1/assets/svg/icons/chevron-right-white.svg) no-repeat;
 }
+

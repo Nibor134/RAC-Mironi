@@ -409,6 +409,7 @@ def api_delete_schedule(schedule_id):
 @students_api.route('/api/checkin/<int:student>/<int:meeting>', methods=['POST'])
 def api_checkin(student, meeting):
     data = request.json
+    student = str(student).zfill(7)
     attendance_date = datetime.now().strftime('%Y-%m-%d')
     attendance_time = datetime.now().strftime('%H:%M:%S')
     status = data.get('status')
@@ -423,7 +424,7 @@ def api_checkin(student, meeting):
     student_data = student_query.fetchone()
     if not student_data:
         conn.close()
-        return jsonify({'error': f'Student {student} not found'}), 404
+        return jsonify({'error': f'Student {student} niet gevonden'}), 404
 
     meeting_query = c.execute('SELECT * FROM Meeting WHERE Meeting_id = ? AND Meeting_date = ?', (meeting, attendance_date))
     meeting_data = meeting_query.fetchone()
@@ -431,15 +432,15 @@ def api_checkin(student, meeting):
 
     if not meeting_data:
         conn.close()
-        return jsonify({'error': f'Meeting {meeting} not found'}), 404
+        return jsonify({'error': f'Meeting {meeting} niet gevonden'}), 404
 
     if meeting_data[11] != 'open' and meeting_data[11] != 'closed':
         conn.close()
-        return jsonify({'error': f'Meeting {meeting} is not open or closed'}), 403
+        return jsonify({'error': f'Meeting {meeting} is niet open of gesloten'}), 403
 
     if meeting_data[11] == 'closed':
         conn.close()
-        return jsonify({'error': f'Check-in for meeting {meeting} has closed'}), 403
+        return jsonify({'error': f'Check-in voor meeting {meeting} is gesloten'}), 403
     
      # Extract the meeting time from the database
     meeting_time = meeting_data[3] 
@@ -447,7 +448,7 @@ def api_checkin(student, meeting):
 
     # Check if the current time is between 10 minutes before and 20 minutes after the meeting time
     checkin_open = datetime.strptime(current_time, '%H:%M') >= datetime.strptime(meeting_time, '%H:%M') - timedelta(minutes=10) \
-                and datetime.strptime(current_time, '%H:%M') <= datetime.strptime(meeting_time, '%H:%M') + timedelta(minutes=1)
+                and datetime.strptime(current_time, '%H:%M') <= datetime.strptime(meeting_time, '%H:%M') + timedelta(minutes=20)
 
     if checkin_open:
         # Check if student is already checked in
@@ -455,7 +456,7 @@ def api_checkin(student, meeting):
         attendance_data = attendance_query.fetchone()
         if attendance_data:
             conn.close()
-            return jsonify({'error': f'Student {student} is already checked in to meeting {meeting}'}), 400
+            return jsonify({'error': f'Student {student} is al ingecheckt voor meeting {meeting}'}), 400
 
         # Add the attendance record
         c.execute('INSERT INTO Attendance (Student_id, Studentnumber, Meeting_id, Attendance_date, Attendance_time, Status, Question, Answer, Reason) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
@@ -463,152 +464,12 @@ def api_checkin(student, meeting):
         conn.commit()
         conn.close()
 
-        return jsonify({'message': f'Student {student} checked in to meeting {meeting} successfully'}), 200
+        return jsonify({'message': f'Student {student} is succesvol ingecheckt voor meeting {meeting}'}), 200
     else:
         conn.close()
-        return jsonify({'error': f'Check-in for meeting {meeting} is closed'}), 403
+        return jsonify({'error': f'Check-in voor meeting {meeting} is gesloten'}), 403
 
 
-
-#@students_api.route('/api/checkin/<int:student>/<int:meeting>', methods=['POST'])
-#def api_checkin(student, meeting):
-    data = request.json
-    attendance_date = datetime.now().strftime('%Y-%m-%d')
-    attendance_time = datetime.now().strftime('%H:%M:%S')
-    status = data.get('status')
-    question = data.get('question')
-    answer = data.get('answer')
-    reason = data.get('reason')
-
-    # Check if the student exists
-    conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
-    c = conn.cursor()
-    student_query = c.execute('SELECT * FROM Students WHERE Studentnumber LIKE ? OR Studentnumber LIKE ?', (f'{str(student)}%', f'0{str(student)}%'))
-    student_data = student_query.fetchone()
-    if not student_data:
-        conn.close()
-        return jsonify({'error': f'Student {student} not found'}), 404
-
-    meeting_query = c.execute('SELECT * FROM Meeting WHERE Meeting_id = ? AND Meeting_date = ?', (meeting, attendance_date,))
-    meeting_data = meeting_query.fetchone()
-
-    if not meeting_data:
-        conn.close()
-        return jsonify({'error': f'Meeting {meeting} not found'}), 404
-    
-    # Extract the meeting time from the database
-    meeting_time = meeting_data[3] 
-    current_time = datetime.now(amsterdam_tz).strftime('%H:%M')
-
-    # Check if the current time is between 10 minutes before and 20 minutes after the meeting time
-    checkin_open = datetime.strptime(current_time, '%H:%M') >= datetime.strptime(meeting_time, '%H:%M') - timedelta(minutes=10) \
-                   and datetime.strptime(current_time, '%H:%M') <= datetime.strptime(meeting_time, '%H:%M') + timedelta(minutes=2)
-    if not checkin_open:
-    # Check-in has closed, get list of all students who have not checked in and are not already marked as absent
-        attendance_query = c.execute('SELECT * FROM Attendance WHERE Meeting_id = ?', (meeting,))
-        attendance_data = attendance_query.fetchall()
-        attendance_students = set(row[1] for row in attendance_data if row[5] != 'afwezig')
-        students_query = c.execute('SELECT * FROM Students')
-        students_data = students_query.fetchall()
-        for student_data in students_data:
-            if student_data[6] not in attendance_students:
-                # Check if the student is already marked as absent
-                existing_query = c.execute('SELECT * FROM Attendance WHERE Meeting_id = ? AND Studentnumber = ? AND Status = ?', (meeting, student_data[6], 'afwezig',))
-                existing_data = existing_query.fetchone()
-                if not existing_data:
-                    # Insert new attendance record for this student with status set to 'afwezig'
-                    c.execute('INSERT INTO Attendance (Student_id, Studentnumber, Meeting_id, Attendance_date, Attendance_time, Status, Question, Answer, Reason) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                            (student_data[0], student_data[6], meeting, attendance_date, attendance_time, 'afwezig', None, None, None,))
-        conn.commit()
-        conn.close()
-        return jsonify({'error': f'Check-in for meeting {meeting} has closed'}), 403
-    
-    # Check if student is already checked in
-    attendance_query = c.execute('SELECT * FROM Attendance WHERE Studentnumber = ? AND Meeting_id = ?', (f'{str(student)}%', f'0{str(student)}%'), meeting,)
-    attendance_data = attendance_query.fetchone()
-    if attendance_data:
-        conn.close()
-        return jsonify({'error': f'Student {student} is already checked in to meeting {meeting}'}), 400
-    
-    # Add the attendance record
-    c.execute('INSERT INTO Attendance (Student_id, Studentnumber, Meeting_id, Attendance_date, Attendance_time, Status, Question, Answer, Reason) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-              (student_data[0], student_data[6], meeting, attendance_date, attendance_time, status, question, answer, reason,))
-    conn.commit()
-    conn.close()
-
-    return jsonify({'message': f'Student {student} checked in to meeting {meeting} successfully'}), 200
-
-#WORKING 
-#@students_api.route('/api/checkin/<int:student>/<int:meeting>', methods=['POST'])
-#def api_checkin(student, meeting):
-    data = request.json
-    attendance_date = datetime.now().strftime('%Y-%m-%d')
-    attendance_time = datetime.now().strftime('%H:%M:%S')
-    status = data.get('status')
-    question = data.get('question')
-    answer = data.get('answer')
-    reason = data.get('reason')
-
-    # Check if the student exists
-    conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
-    c = conn.cursor()
-    student_query = c.execute('SELECT * FROM Students WHERE Studentnumber = ?', (str(student).zfill(7),))
-    student_data = student_query.fetchone()
-    if not student_data:
-        conn.close()
-        print(student)
-        return jsonify({'error': f'Student {student} not found'}), 404
-
-    meeting_query = c.execute('SELECT * FROM Meeting WHERE Meeting_id = ? AND Meeting_date = ?', (meeting, attendance_date,))
-    meeting_data = meeting_query.fetchone()
-
-    if not meeting_data:
-        conn.close()
-        return jsonify({'error': f'Meeting {meeting} not found'}), 404
-    
-    # Extract the meeting time from the database
-    meeting_time = meeting_data[3] 
-    current_time = datetime.now(amsterdam_tz).strftime('%H:%M')
-
-    # Check if the current time is between 10 minutes before and 20 minutes after the meeting time
-    if not (datetime.strptime(current_time, '%H:%M') >= datetime.strptime(meeting_time, '%H:%M') - timedelta(minutes=10)
-            and datetime.strptime(current_time, '%H:%M') <= datetime.strptime(meeting_time, '%H:%M') + timedelta(minutes=20)):
-        conn.close()
-        return jsonify({'error': f'Check-in is not available for meeting {meeting} at this time'}), 403
-
-    # Add the attendance record
-    c.execute('INSERT INTO Attendance (Student_id, Studentnumber, Meeting_id, Attendance_date, Attendance_time, Status, Question, Answer, Reason) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                (student_data[0], student_data[6], meeting, attendance_date, attendance_time, status, question, answer, reason,))
-    conn.commit()
-    conn.close()
-
-    return jsonify({'message': f'Student {student} checked in to meeting {meeting} successfully'}), 200
-
-#@students_api.route('/api/checkin/<int:student>', methods=['POST'])
-#def api_checkin(student):
-    data = request.json
-    attendance_date = datetime.now().strftime('%Y-%m-%d')
-    attendance_time = datetime.now().strftime('%H:%M:%S')
-    status = data.get('status')
-    question = data.get('question')
-    answer = data.get('answer')
-    reason = data.get('reason')
-
-    
-    conn = connect_to_db()
-    cursor = conn.cursor()
-    student_query = cursor.execute('SELECT * FROM Students WHERE Studentnumber = ?', (student,))
-    student_data = student_query.fetchone()
-    if not student_data:
-        return jsonify({'error': f'Student {student} not found'}), 404
-
-    
-    cursor.execute('INSERT INTO Attendance (Student_id, Studentnumber, Attendance_date, Attendance_time, Status, Question, Answer, Reason) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-                (student_data[0], student_data[5], attendance_date, attendance_time, status, question, answer, reason))
-    conn.commit()
-    conn.close()
-
-    return jsonify({'message': f'Student {student} checked in successfully'}), 200
 
 @students_api.route('/api/questions/random', methods=['GET'])
 def get_random_question():
@@ -724,7 +585,7 @@ def get_attendance():
     cursor = conn.cursor()
 
     # Retrieve attendance records from the database
-    cursor.execute('SELECT Students.student_name, Students.studentnumber, Attendance.Attendance_date, Attendance.Attendance_time, Attendance.Status, Attendance.Meeting_id, Students.class_id FROM Students INNER JOIN Attendance ON Students.Student_id=Attendance.Student_id')
+    cursor.execute('SELECT Students.student_name, Students.studentnumber, Attendance.Attendance_date, Attendance.Attendance_time, Attendance.Status, Attendance.Meeting_id, Students.class_id, Attendance.question, Attendance.answer, Attendance.reason FROM Students INNER JOIN Attendance ON Students.Student_id=Attendance.Student_id')
     rows = cursor.fetchall()
 
     # Convert the records into a list of dictionaries
@@ -736,12 +597,16 @@ def get_attendance():
             'date': row[2],
             'time': row[3],
             'status': row[4],
-            'Meeting_id':row[5],
-            'class_id': row[6]
+            'Meeting_id': row[5],
+            'class_id': row[6],
+            'question': row[7],
+            'answer': row[8],
+            'reason': row[9]
         })
     conn.close()
 
     return jsonify({'attendance': attendance})
+
 
 @students_api.route('/api/attendance/<int:attendance_id>', methods=['DELETE'])
 def delete_attendance(attendance_id):
@@ -796,6 +661,7 @@ def create_meeting():
         meeting_duration = data.get('duration')
         meeting_location = data.get('location')
         meeting_description = data.get('description')
+        meeting_question = data.get('question')
         created_by = data.get('created_by')
         created_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         class_id = data.get('class_id')
@@ -806,8 +672,8 @@ def create_meeting():
         c = conn.cursor()
 
         # Add the new meeting to the database
-        c.execute('INSERT INTO Meeting (Meeting_title, Meeting_date, Meeting_time, Meeting_duration, Meeting_location, Meeting_description, Class_id, meeting_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', 
-                        (meeting_title, meeting_date, meeting_time, meeting_duration, meeting_location, meeting_description, class_id, 'open',))
+        c.execute('INSERT INTO Meeting (Meeting_title, Meeting_date, Meeting_time, Meeting_duration, Meeting_location, Meeting_description, Class_id, meeting_status, Question) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', 
+                        (meeting_title, meeting_date, meeting_time, meeting_duration, meeting_location, meeting_description, class_id, 'open', meeting_question))
 
         # Retrieve the ID of the newly created meeting
         meeting_id = c.lastrowid
@@ -846,7 +712,7 @@ def api_close_meeting(meeting):
             if not existing_data:
                 # Insert new attendance record for this student with status set to 'afwezig'
                 c.execute('INSERT INTO Attendance (Studentnumber, Student_id, Meeting_id, Attendance_date, Attendance_time, Status, Question, Answer, Reason) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                        (student_data[5], student_data[0], meeting, attendance_date, attendance_time, 'Afwezig', None, None, None,))
+                        (student_data[5], student_data[0], meeting, attendance_date, attendance_time, 'Afwezig', None, None, 'Niet in/uitgecheckt',))
 
         
     # Update the meeting status to 'closed'
@@ -897,6 +763,47 @@ def delete_all_meetings():
 
     # Return a success message
     return jsonify({'message': f'Attendance records with IDs between {start_id} and {end_id} deleted successfully.'})
+
+@students_api.route('/api/students/delete_all', methods=['DELETE'])
+def delete_all_students():
+    # Get the range of attendance IDs to delete from the request body
+    data = request.json
+    start_id = data.get('start_id')
+    end_id = data.get('end_id')
+    
+    if not start_id or not end_id:
+        return jsonify({'error': 'Start and end IDs not provided in request body.'}), 400
+
+    # Connect to the database
+    conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
+    c = conn.cursor()
+
+    # Delete the attendance records with the given range of IDs
+    c.execute('DELETE FROM Students WHERE Student_id >= ? AND Student_id <= ?', (start_id, end_id))
+
+    # Commit the changes and close the database connection
+    conn.commit()
+    conn.close()
+
+    # Return a success message
+    return jsonify({'message': f'Attendance records with IDs between {start_id} and {end_id} deleted successfully.'})
+
+
+@students_api.route('/api/students/insert', methods=['POST'])
+def insert_students():
+    
+    students = request.get_json()
+    if not students:
+        return jsonify({'message': 'No data provided'}), 400
+
+    conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
+    c = conn.cursor()
+
+    for student in students:
+        c.execute("INSERT INTO students (class_id, other_details, Studentnumber, Student_name, Username, Password) VALUES (?, ?, ?, ?, ?, ?)",
+                       (student['class_id'], student['other_details'], student['Studentnumber'], student['Student_name'], student['Username'], student['Password']))
+    conn.commit()
+    return jsonify({'message': 'Students inserted successfully'}), 201
 
 @students_api.route('/api/all_meetings', methods=['GET'])
 def get_meetings():

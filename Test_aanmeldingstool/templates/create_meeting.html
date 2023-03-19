@@ -5,7 +5,7 @@
 <div class="container">
   <div class="row">
     <div class="col-md-6 offset-md-3">
-      <h2>Creeër een nieuwe meeting</h2>
+      <h2>Creëer een nieuwe meeting</h2>
       <form id="create-meeting-form">
         <div class="form-group">
           <label for="title">Titel:</label>
@@ -30,6 +30,10 @@
         <div class="form-group">
           <label for="description">Beschrijving:</label>
           <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+        </div>
+        <div class="form-group">
+          <label for="question">Vraag:</label>
+          <textarea class="form-control" id="question" name="question" rows="3"></textarea>
         </div>
         <div class="form-group">
           <label for="class_id">Klas:</label>
@@ -62,15 +66,16 @@
               'duration': $('#duration').val(),
               'location': $('#location').val(),
               'description': $('#description').val(),
+              'question': $('#question').val(),
               'class_id': $('#class_id').val(),
             }),
             contentType: 'application/json',
             success: function(data) {
-                alert('Meeting created successfully!');
+                alert('Meeting gecreëerd!');
                 window.location.href = '/meetings/' + data.meeting_id;
                 },
             error: function(jqXHR, textStatus, errorThrown) {
-              alert('Error creating meeting: ' + textStatus);
+              alert('Fout met creëren meeting: ' + textStatus);
             }
           });
         });

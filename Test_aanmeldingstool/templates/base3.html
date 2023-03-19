@@ -17,7 +17,7 @@
 					<a class="navbar-brand logo_button" href="https://www.hogeschoolrotterdam.nl/"><img class="logo" src="{{ url_for('static', filename='images/logo.svg') }}" name="HomeButton" action="/main"></a>
 				</li>
 				<li class="nav-item d-flex align-items-center">
-					<div>Dashboard</div>
+					
 				</li>
 			</ul>
 				<ul class="navbar-nav mr-auto">
@@ -52,7 +52,7 @@
         Dashboard
       </a>
       <a href="{{ url_for('teacher.attendance') }}">Aanwezigheid</a>
-      <a href="{{ url_for('teacher.make_meeting') }}">Creeër een meeting</a>
+      <a href="{{ url_for('teacher.make_meeting') }}">Creëer een meeting</a>
       <a href="{{ url_for('teacher.t_upcoming_meetings') }}">Aankomende meetings</a>
       <a href="{{ url_for('teacher.t_all_meetings') }}">Alle meetings</a>
 		</div>
@@ -66,7 +66,7 @@
   <script>
 		function openNav() {
 			document.getElementById("mySidenav").style.width = "500px";
-			document.getElementById("main").style.marginRight = "350px";
+			document.getElementById("main").style.marginRight = "250px";
 			document.body.style.backgroundColor = "rgba(0, 0, 0, 0.3)";
 		}
 		
