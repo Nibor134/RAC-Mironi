@@ -966,7 +966,23 @@ def get_meetings():
 def api_getmeetings():
     return jsonify(get_meetings())
 
-# #Admin API - Class
+# Admin API - Class
+@students_api.route('/api/all_classes', methods=['GET'])
+def get_all_classes():
+    # Connect to the database
+    conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
+    c = conn.cursor()
+
+    # Get the upcoming meetings
+    c.execute('SELECT class_id, classname FROM Class')
+    klassen = c.fetchall()
+
+    # Close the database connection
+    conn.close()
+
+    # Return the meetings in the response
+    return jsonify({'all_classes': klassen})
+
 # def insert_class(klas):
 #     inserted_class = {}
 #     try:

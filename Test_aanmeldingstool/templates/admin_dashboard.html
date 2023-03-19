@@ -97,17 +97,18 @@
 			<a href="">Klassen</a>
 		</div>
 	</div>
-	<div class="container">
+	<div style="padding-top: 75px;" class="container">
 		<div class="card bg-light mb-3" style="max-width: 18rem;">
-			<div class="card-header">Add Klas</div>
+			<div class="card-header">Alle Klassen
+				<a style="float: right;" href="#">Toevoegen</a></div>
 			<div class="card-body">
-		  		<p class="card-text">
-				
-				</p>
+				<div id="class-list">
+
+				</div>
+			</div>
 			</div>
 	  	</div>
 	</div>
-
 	<script>
 		function openNav() {
 			document.getElementById("mySidenav").style.width = "500px";
@@ -120,6 +121,36 @@
 			document.getElementById("main").style.marginRight = "0";
 			document.body.style.backgroundColor = "#fff7ea";
 		}
+	</script>
+	<script src="https://code.jquery.com/jquery-3.6.2.min.js"></script>
+	<script>
+	  $(document).ready(function() {
+		// Make a GET request to the API endpoint
+		$.ajax({
+		  url: '/api/all_classes',
+		  type: 'GET',
+		  dataType: 'json',
+		  success: function(data) {
+			var klassen = data.all_classes;
+			klassen.forEach(function(klas) {
+			  var classId = klas[0];
+			  var className = klas[1];
+	
+			  var cardDiv = $('<div>');
+			  var cardText = $('<p style="display: inline-block; padding-right: 10px;" class="card-text">').text(classId);
+			  var cardSubText = $('<p style="display: inline-block;" class="card-text">').text(className);
+	
+			  cardDiv.append(cardText);
+			  cardDiv.append(cardSubText);
+	
+			  $('#class-list').append(cardDiv);
+			});
+		  },
+		  error: function(error) {
+			console.log(error);
+		  }
+		});
+	  });    
 	</script>
 </body>
 </html>
