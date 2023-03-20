@@ -15,12 +15,12 @@ c = conn.cursor()
 def admin_students():
     c.execute("SELECT * FROM Students")
     students = c.fetchall()
-    return render_template('admin_students.html', students=students)
+    return render_template('admin/admin_students.html', students=students)
 
 
 @admin.route('/admin/students/add', methods=['GET'])
 def add_student_form():
-    return render_template('admin_add_students.html')
+    return render_template('admin/admin_add_students.html')
 
 # Route to add a new student
 @admin.route('/admin/students/add', methods=['POST'])
@@ -73,7 +73,7 @@ def update_student_per_id(student_id=None):
     else:
         c.execute("SELECT * FROM Students WHERE student_id = ?", (student_id,))
         student = c.fetchone()
-        return render_template('admin_update_students.html', student=student)
+        return render_template('admin/admin_update_students.html', student=student)
 
 # Route to delete a student
 @admin.route('/admin/students/delete', methods=['POST'])
@@ -90,7 +90,7 @@ def delete_student():
 def admin_faculties():
     c.execute("SELECT * FROM Faculty")
     faculties = c.fetchall()
-    return render_template('admin_faculties.html', faculties=faculties)
+    return render_template('admin/admin_faculties.html', faculties=faculties)
 
 @admin.route('/admin/faculties/add', methods=['GET'])
 def add_faculty_form():
@@ -144,7 +144,7 @@ def update_faculty_per_id(faculty_id=None):
     else:
         c.execute("SELECT * FROM Faculty WHERE faculty_id = ?", (faculty_id,))
         faculty = c.fetchone()
-        return render_template('admin_update_faculties.html', faculty=faculty)
+        return render_template('admin/admin_update_faculties.html', faculty=faculty)
 
 # Route to delete a faculty
 @admin.route('/admin/faculties/delete', methods=['POST'])
