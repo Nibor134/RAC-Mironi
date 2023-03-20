@@ -296,3 +296,63 @@ def delete_meeting():
         return admin_meetings()
     else:
         return redirect(url_for('index'))
+    
+# Route to see all classes
+@admin.route('/admin/classes', methods=['GET'])
+def admin_classes():
+    c.execute("SELECT * FROM Class")
+    classes = c.fetchall()
+    return render_template('admin/admin_classes.html', classes=classes)
+
+@admin.route('/admin/classes/add', methods=['GET'])
+def add_class_form():
+    return render_template('admin/admin_add_class.html')
+
+# Route to add a new class
+@admin.route('/admin/classes/add', methods=['POST'])
+def add_class():
+    class_name = request.form['class_name']
+
+    c.execute("INSERT INTO Class (classname) VALUES (?)",
+              (class_name,))
+    conn.commit()
+
+    return admin_classes()
+
+# Route to update an existing student
+@admin.route('/admin/classes/update', methods=['POST'])
+def update_class():
+    class_id = request.form['class_id']
+    class_name = request.form['class_name']
+
+    c.execute("UPDATE Class SET classname = ? WHERE class_id = ?",
+              (class_name, class_id))
+    conn.commit()
+
+    return admin_classes()
+
+# Route to update a class
+@admin.route('/admin/classes/update/<int:class_id>', methods=['GET', 'POST'])
+def update_classes_per_id(class_id=None):
+    if request.method == 'POST':
+        class_name = request.form['class_name']
+
+        c.execute("UPDATE Class SET classname = ? WHERE class_id = ?",
+                  (class_name, class_id))
+        conn.commit()
+
+        return admin_classes()
+    else:
+        c.execute("SELECT * FROM Class WHERE class_id = ?", (class_id,))
+        classes = c.fetchone()
+        return render_template('admin/admin_update_class.html', classes=classes)
+
+# Route to delete a class
+@admin.route('/admin/classes/delete', methods=['POST'])
+def delete_classes():
+    class_id = request.form['class_id']
+
+    c.execute("DELETE FROM Class WHERE class_id = ?", (class_id,))
+    conn.commit()
+
+    return admin_classes()
