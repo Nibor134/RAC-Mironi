@@ -10,15 +10,17 @@
     <link rel="shortcut icon" href="{{ url_for('static', filename='images/logo.svg') }}">
 </head>
 <body>
-    <h1>Voeg toe aan Klassen</h1>
-    <div class="container">
-        <form action="/admin/classes/add" method="post">
-            <div class="mb-3">
-                <label for="class_name" class="form-label">Klasnaam:</label>
-                <input type="text" class="form-control" id="class_name" name="class_name" required>
-              </div>
-            <button type="submit" class="btn btn-primary">Voeg toe</button>
-        </form>
+    <div style="padding-top: 25px;">
+        <h1 class="fw-bold">Voeg toe aan Klassen</h1>
+        <div class="container">
+            <form action="/admin/classes/add" method="post">
+                <div class="mb-3">
+                    <label for="class_name" class="form-label">Klasnaam:</label>
+                    <input type="text" class="form-control" id="class_name" name="class_name" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Voeg toe</button>
+            </form>
+        </div>
     </div>
       
     <a href="/admin/classes">Terug naar alle Klassen</a>

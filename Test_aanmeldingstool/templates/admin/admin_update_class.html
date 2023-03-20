@@ -11,18 +11,19 @@
     <link rel="shortcut icon" href="{{ url_for('static', filename='images/logo.svg') }}">
 </head>
 <body>
-    <h1>Update Klas</h1>
-    <div class="container">
-        <form action="/admin/classes/update/{{ class[0] }}" method="post">
-            <input type="hidden" name="class_id" value="{{ class[0] }}">
-            <div class="mb-3">
-              <label for="class_name" class="form-label">Klasnaam:</label>
-              <input type="text" class="form-control" id="class_name" name="class_name" value="{{ class[1] }}" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Update Klas</button>
-          </form>
-          
-</div>
+    <div style="padding-top: 25px;">
+        <h1 class="fw-bold">Update Klas</h1>
+        <div class="container">
+            <form action="/admin/classes/update/{{ classes[0] }}" method="post">
+                <input type="hidden" name="class_id" value="{{ classes[0] }}">
+                <div class="mb-3">
+                    <label for="class_name" class="form-label">Klasnaam:</label>
+                    <input type="text" class="form-control" id="class_name" name="class_name" value="{{ classes[1] }}" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Update Klas</button>
+            </form>
+        </div>
+    </div>
     <a href="/admin/classes">Terug naar klassen</a>
 </body>
 {% endblock %}
