@@ -38,7 +38,6 @@ def add_student():
 
     return admin_students()
 
-
 # Route to update an existing student
 @admin.route('/admin/students/update', methods=['POST'])
 def update_student():
@@ -85,3 +84,74 @@ def delete_student():
     conn.commit()
 
     return admin_students()
+
+# Route to display all faculties in an HTML table
+@admin.route('/admin/faculties', methods=['GET'])
+def admin_faculties():
+    c.execute("SELECT * FROM Faculty")
+    faculties = c.fetchall()
+    return render_template('admin_faculties.html', faculties=faculties)
+
+@admin.route('/admin/faculties/add', methods=['GET'])
+def add_faculty_form():
+    return render_template('admin_add_faculties.html')
+
+# Route to add a new faculty
+@admin.route('/admin/faculties/add', methods=['POST'])
+def add_faculty():
+    faculty_name = request.form['faculty_name']
+    faculty_email = request.form['faculty_email']
+    other_details = request.form['other_details']
+    username = request.form['username']
+    password = request.form['password']
+
+    c.execute("INSERT INTO faculty (faculty_name, faculty_email, other_details, username, password) VALUES (?, ?, ?, ?, ?)",
+              (faculty_name, faculty_email, other_details, username, password))
+    conn.commit()
+
+    return admin_faculties()
+
+# Route to update an existing faculty
+@admin.route('/admin/faculties/update', methods=['POST'])
+def update_faculty():
+    faculty_id = request.form['faculty_id']
+    faculty_name = request.form['faculty_name']
+    faculty_email = request.form['faculty_email']
+    other_details = request.form['other_details']
+    username = request.form['username']
+    password = request.form['password']
+
+    c.execute("UPDATE faculty SET faculty_name = ?, faculty_email = ?, other_details = ?, username = ?, password = ? WHERE faculty_id = ?",
+              (faculty_name, faculty_email, other_details, username, password, faculty_id))
+    conn.commit()
+
+    return admin_faculties()
+
+@admin.route('/admin/faculties/update/<int:faculty_id>', methods=['GET', 'POST'])
+def update_faculty_per_id(faculty_id=None):
+    if request.method == 'POST':
+        faculty_name = request.form['faculty_name']
+        faculty_email = request.form['faculty_email']
+        other_details = request.form['other_details']
+        username = request.form['username']
+        password = request.form['password']
+
+        c.execute("UPDATE faculty SET faculty_name = ?, faculty_email = ?, other_details = ?, username = ?, password = ? WHERE faculty_id = ?",
+                  (faculty_name, faculty_email, other_details, username, password, faculty_id))
+        conn.commit()
+
+        return admin_faculties()
+    else:
+        c.execute("SELECT * FROM Faculty WHERE faculty_id = ?", (faculty_id,))
+        faculty = c.fetchone()
+        return render_template('admin_update_faculties.html', faculty=faculty)
+
+# Route to delete a faculty
+@admin.route('/admin/faculties/delete', methods=['POST'])
+def delete_faculty():
+    faculty_id = request.form['faculty_id']
+
+    c.execute("DELETE FROM faculty WHERE faculty_id = ?", (faculty_id,))
+    conn.commit()
+
+    return admin_faculties()
