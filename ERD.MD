@@ -8,8 +8,6 @@ The entities that can be identified are:
 * Courses
 * Schedule
 
-
-
 The attributes associated with each entity are:
 
 **Students:**
@@ -47,9 +45,10 @@ The attributes associated with each entity are:
 * class_id
 
 **Meeting:**
+
 * Meeting_id
 * Meeting_title
-* Meeting_date 
+* Meeting_date
 * Meeting_time
 * Meeting_duration
 * Meeting_location
@@ -59,17 +58,21 @@ The attributes associated with each entity are:
 * Updated_at,
 * class_id
 * meeting_status
+* Question
 
 **Class:**
+
 * class_id
 * classname
 
 **Courses:**
+
 * course_id
 * course_name
 * other_details
 
 **Schedule:**
+
 * schedule_id
 * course_id
 * faculty_id

@@ -1,4 +1,3 @@
-# Route to create new class
 from flask import Flask, request, jsonify, Blueprint, session, redirect, render_template, url_for, flash
 from flask_cors import CORS
 import requests
@@ -8,7 +7,7 @@ import pytz
 
 student_route = Blueprint('student_route', __name__)
 amsterdam_tz = pytz.timezone('Europe/Amsterdam')
-# Student dashboard
+
 conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db', check_same_thread=False)
 c = conn.cursor()
 
