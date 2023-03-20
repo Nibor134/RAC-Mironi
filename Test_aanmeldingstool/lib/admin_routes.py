@@ -374,3 +374,82 @@ def delete_class():
         return admin_classes()
     else:
         return redirect(url_for('index'))
+    
+
+# Route to see all attendance
+@admin.route('/admin/attendance', methods=['GET'])
+def admin_attendance():
+    if 'admin_logged_in' in session:
+        c.execute("SELECT * FROM Attendance")
+        attendances = c.fetchall()
+        return render_template('admin/admin_attendance.html', attendances=attendances)
+    else:
+        return redirect(url_for('index'))
+
+@admin.route('/admin/attendance/add', methods=['GET'])
+def add_attendance_form():
+    if 'admin_logged_in' in session:
+        return render_template('admin/admin_add_attendance.html')
+    else:
+        return redirect(url_for('index'))
+
+# Route to add a new class
+@admin.route('/admin/attendance/add', methods=['POST'])
+def add_attendance():
+    if 'admin_logged_in' in session:
+        class_name = request.form['class_name']
+
+        c.execute("INSERT INTO Class (classname) VALUES (?)",
+                (class_name,))
+        conn.commit()
+
+        return admin_attendance()
+    else:
+        return redirect(url_for('index'))
+
+# Route to update an existing student
+@admin.route('/admin/attendance/update', methods=['POST'])
+def update_attendance():
+    if 'admin_logged_in' in session:
+        class_id = request.form['class_id']
+        class_name = request.form['class_name']
+
+        c.execute("UPDATE Class SET classname = ? WHERE class_id = ?",
+                (class_name, class_id))
+        conn.commit()
+
+        return admin_attendance()
+    else:
+        return redirect(url_for('index'))
+
+# Route to update a class
+@admin.route('/admin/attendance/update/<int:attendance_id>', methods=['GET', 'POST'])
+def update_attendance_per_id(class_id=None):
+    if 'admin_logged_in' in session:
+        if request.method == 'POST':
+            class_name = request.form['class_name']
+
+            c.execute("UPDATE Class SET classname = ? WHERE class_id = ?",
+                    (class_name, class_id))
+            conn.commit()
+
+            return admin_attendance()
+        else:
+            c.execute("SELECT * FROM Class WHERE class_id = ?", (class_id,))
+            classes = c.fetchone()
+            return render_template('admin/admin_update_class.html', classes=classes)
+    else:
+        return redirect(url_for('index'))
+
+# Route to delete a class
+@admin.route('/admin/attendance/delete', methods=['POST'])
+def delete_attendance():
+    if 'admin_logged_in' in session:  
+        class_id = request.form['class_id']
+
+        c.execute("DELETE FROM Class WHERE class_id = ?", (class_id,))
+        conn.commit()
+
+        return admin_attendance()
+    else:
+        return redirect(url_for('index'))
