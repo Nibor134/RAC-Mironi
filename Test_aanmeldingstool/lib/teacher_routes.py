@@ -25,7 +25,7 @@ def create_class():
             
             return redirect(url_for('teacher_dashboard'))
             
-        return render_template('create_class.html')
+        return render_template('teachers/create_class.html')
     else:
         flash('Log alstublieft eerst in', 'danger')
         return redirect(url_for('login'))
@@ -38,7 +38,7 @@ def view_classes():
         c.execute('SELECT * FROM Schedule')
         classes = c.fetchall()
         conn.close()
-        return render_template('view_classes2.html', classes=classes)
+        return render_template('teachers/view_classes2.html', classes=classes)
     else:
         flash('Log alstublieft eerst in', 'danger')
         return redirect(url_for('login'))
@@ -47,7 +47,7 @@ def view_classes():
 def attendance():
     if 'teacher_logged_in' in session:
         print(session)
-        return render_template('aanwezigheid.html')
+        return render_template('teachers/aanwezigheid.html')
     else:
         flash('Log alstublieft eerst in', 'danger')
         return redirect(url_for('login'))
@@ -79,20 +79,31 @@ def meeting(meeting_id):
         name = c.fetchone()[0]
         conn.close()
         # Render the meeting template with the meeting data
-        return render_template('meetings.html', meeting=meeting, ip_str=ip_str, meeting_id=meeting_id, class_name=class_name, name=name )
+        return render_template('teachers/meetings.html', meeting=meeting, ip_str=ip_str, meeting_id=meeting_id, class_name=class_name, name=name )
     else:
         flash('Log alstublieft eerst in', 'danger')
     return redirect(url_for('login'))
 
 @teacher.route('/create_meeting')
 def make_meeting():
-    
-    return render_template('create_meeting.html')
+    if 'teacher_logged_in' in session: 
+        return render_template('teachers/create_meeting.html')
+    else:
+        flash('Log alstublieft eerst in', 'danger')
+    return redirect(url_for('login'))
 
 @teacher.route('/teacher/upcoming_meetings')
 def t_upcoming_meetings():
-    return render_template('teacher_upcoming_meetings.html')
+    if 'teacher_logged_in' in session: 
+        return render_template('teachers/teacher_upcoming_meetings.html')
+    else:
+        flash('Log alstublieft eerst in', 'danger')
+    return redirect(url_for('login'))
 
 @teacher.route('/teacher/all_meetings')
 def t_all_meetings():
-    return render_template('teacher_all_meetings.html')
+    if 'teacher_logged_in' in session: 
+        return render_template('teachers/teacher_all_meetings.html')
+    else:
+        flash('Log alstublieft eerst in', 'danger')
+    return redirect(url_for('login'))

@@ -38,7 +38,7 @@ def teacher_dashboard():
         c.execute('SELECT faculty_name FROM faculty WHERE faculty_email = ?', (session['username'],))
         teacher_id = session.get('user_id')
         name_t = c.fetchone()[0]
-        return render_template('teacher_dashboard.html', name_t=name_t)
+        return render_template('teachers/teacher_dashboard.html', name_t=name_t)
     else:
         flash('Ongeldige inloggegevens.', 'danger')
         return redirect(url_for('login'))
