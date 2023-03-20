@@ -111,3 +111,21 @@ nav {
     background-color: transparent!important;
     text-decoration: underline;
 }
+
+.btn-primary {
+    background-color: #3caad7;
+    border-color: #3caad7;
+  }
+  
+  .btn-primary:hover,
+  .btn-primary:focus {
+    background-color: #1f7ca8;
+    border-color: #1f7ca8;
+  }
+  
+  .btn-primary:active {
+    background-color: #1a6a8a;
+    border-color: #1a6a8a;
+  }
+  
+  
