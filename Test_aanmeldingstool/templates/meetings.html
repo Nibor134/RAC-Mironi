@@ -27,19 +27,27 @@
         </div>
       </div>
     </div>
+    
     <div class="col">
       <div class="card mb-4">
         <div class="card-body d-flex justify-content-center" id="qrcode"></div>
       </div>
       <button id="close-meeting-btn" class="btn btn-danger" href="{{ url_for('teacher_dashboard') }}" data-meeting-id="{{ meeting.Meeting_id }}">Sluit de meeting</button>    
     </div>
+
+    <div class="row">
+      <div class="col">
     <div class="card mb-4">
+      <div class="card-header">
+        Vraag:
+      </div>
       <div class="card-body">
         <p class="card-text">{{ meeting[12] }}</p>
         <p class="card-text text-danger">Username = Studentnummer</p>
         <p class="card-text text-danger">Wachtwoord = Password</p>
       </div>
-      
+    </div>
+  </div>
       </div>
     </div>
   </div>
