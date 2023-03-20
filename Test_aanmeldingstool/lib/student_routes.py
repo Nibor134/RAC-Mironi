@@ -111,7 +111,11 @@ def rooster():
 
 @student_route.route('/student/upcoming_meetings')
 def s_upcoming_meetings():
-    return render_template('student_upcoming_meetings.html')
+    if 'student_logged_in' in session:
+        return render_template('student_upcoming_meetings.html')
+    else:
+        flash('Log alstublieft eerst in', 'danger')
+    return redirect(url_for('login'))
 
 @student_route.route('/checkin/<int:meeting_id>', methods=['GET'])
 def check_in(meeting_id):

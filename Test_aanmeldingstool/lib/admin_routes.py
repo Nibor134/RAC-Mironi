@@ -13,51 +13,26 @@ c = conn.cursor()
 # Route to display all students in a HTML table
 @admin.route('/admin/students', methods=['GET'])
 def admin_students():
-    c.execute("SELECT * FROM Students")
-    students = c.fetchall()
-    return render_template('admin/admin_students.html', students=students)
+    if 'admin_logged_in' in session:
+        c.execute("SELECT * FROM Students")
+        students = c.fetchall()
+        return render_template('admin/admin_students.html', students=students)
+    else:
+        return redirect(url_for('index'))
+
 
 
 @admin.route('/admin/students/add', methods=['GET'])
 def add_student_form():
-    return render_template('admin/admin_add_students.html')
+    if 'admin_logged_in' in session:
+        return render_template('admin/admin_add_students.html')
+    else:
+        return redirect(url_for('index'))
 
 # Route to add a new student
 @admin.route('/admin/students/add', methods=['POST'])
 def add_student():
-    student_name = request.form['student_name']
-    other_details = request.form['other_details']
-    username = request.form['username']
-    password = request.form['password']
-    student_number = request.form['student_number']
-    class_id = request.form['class_id']
-
-    c.execute("INSERT INTO students (student_name, other_details, username, password, studentnumber, class_id) VALUES (?, ?, ?, ?, ?, ?)",
-              (student_name, other_details, username, password, student_number, class_id))
-    conn.commit()
-
-    return admin_students()
-
-# Route to update an existing student
-@admin.route('/admin/students/update', methods=['POST'])
-def update_student():
-    student_id = request.form['student_id']
-    student_name = request.form['student_name']
-    other_details = request.form['other_details']
-    username = request.form['username']
-    password = request.form['password']
-    student_number = request.form['student_number']
-    class_id = request.form['class_id']
-
-    c.execute("UPDATE students SET student_name = ?, other_details = ?, username = ?, password = ?, student_number = ?, class_id = ? WHERE student_id = ?",
-              (student_name, other_details, username, password, student_number, class_id, student_id))
-    conn.commit()
-
-    return admin_students()
-
-@admin.route('/admin/students/update/<int:student_id>', methods=['GET', 'POST'])
-def update_student_per_id(student_id=None):
-    if request.method == 'POST':
+    if 'admin_logged_in' in session:
         student_name = request.form['student_name']
         other_details = request.form['other_details']
         username = request.form['username']
@@ -65,71 +40,110 @@ def update_student_per_id(student_id=None):
         student_number = request.form['student_number']
         class_id = request.form['class_id']
 
-        c.execute("UPDATE students SET student_name = ?, other_details = ?, username = ?, password = ?, studentnumber = ?, class_id = ? WHERE student_id = ?",
-                  (student_name, other_details, username, password, student_number, class_id, student_id))
+        c.execute("INSERT INTO students (student_name, other_details, username, password, studentnumber, class_id) VALUES (?, ?, ?, ?, ?, ?)",
+                (student_name, other_details, username, password, student_number, class_id))
         conn.commit()
 
         return admin_students()
     else:
-        c.execute("SELECT * FROM Students WHERE student_id = ?", (student_id,))
-        student = c.fetchone()
-        return render_template('admin/admin_update_students.html', student=student)
+        return redirect(url_for('index'))
+
+# Route to update an existing student
+@admin.route('/admin/students/update', methods=['POST'])
+def update_student():
+    if 'admin_logged_in' in session:
+        student_id = request.form['student_id']
+        student_name = request.form['student_name']
+        other_details = request.form['other_details']
+        username = request.form['username']
+        password = request.form['password']
+        student_number = request.form['student_number']
+        class_id = request.form['class_id']
+
+        c.execute("UPDATE students SET student_name = ?, other_details = ?, username = ?, password = ?, student_number = ?, class_id = ? WHERE student_id = ?",
+                (student_name, other_details, username, password, student_number, class_id, student_id))
+        conn.commit()
+
+        return admin_students()
+    else:
+        return redirect(url_for('index'))
+
+@admin.route('/admin/students/update/<int:student_id>', methods=['GET', 'POST'])
+def update_student_per_id(student_id=None):
+    if 'admin_logged_in' in session:
+        if request.method == 'POST':
+            student_name = request.form['student_name']
+            other_details = request.form['other_details']
+            username = request.form['username']
+            password = request.form['password']
+            student_number = request.form['student_number']
+            class_id = request.form['class_id']
+
+            c.execute("UPDATE students SET student_name = ?, other_details = ?, username = ?, password = ?, studentnumber = ?, class_id = ? WHERE student_id = ?",
+                    (student_name, other_details, username, password, student_number, class_id, student_id))
+            conn.commit()
+
+            return admin_students()
+        else:
+            c.execute("SELECT * FROM Students WHERE student_id = ?", (student_id,))
+            student = c.fetchone()
+            return render_template('admin/admin_update_students.html', student=student)
+    else:
+        return redirect(url_for('index'))
 
 # Route to delete a student
 @admin.route('/admin/students/delete', methods=['POST'])
 def delete_student():
-    student_id = request.form['student_id']
+    if 'admin_logged_in' in session:
+        student_id = request.form['student_id']
 
-    c.execute("DELETE FROM students WHERE student_id = ?", (student_id,))
-    conn.commit()
+        c.execute("DELETE FROM students WHERE student_id = ?", (student_id,))
+        conn.commit()
 
-    return admin_students()
+        return admin_students()
+    else:
+        return redirect(url_for('index'))
 
 # Route to display all faculties in an HTML table
 @admin.route('/admin/faculties', methods=['GET'])
 def admin_faculties():
-    c.execute("SELECT * FROM Faculty")
-    faculties = c.fetchall()
-    return render_template('admin/admin_faculties.html', faculties=faculties)
+    if 'admin_logged_in' in session:
+        c.execute("SELECT * FROM Faculty")
+        faculties = c.fetchall()
+        return render_template('admin/admin_faculties.html', faculties=faculties)
+    else:
+        return redirect(url_for('index'))
 
 @admin.route('/admin/faculties/add', methods=['GET'])
 def add_faculty_form():
-    return render_template('admin_add_faculties.html')
+    if 'admin_logged_in' in session:
+        return render_template('admin_add_faculties.html')
+    else:
+        return redirect(url_for('index'))
 
 # Route to add a new faculty
 @admin.route('/admin/faculties/add', methods=['POST'])
 def add_faculty():
-    faculty_name = request.form['faculty_name']
-    faculty_email = request.form['faculty_email']
-    other_details = request.form['other_details']
-    username = request.form['username']
-    password = request.form['password']
+    if 'admin_logged_in' in session:
+        faculty_name = request.form['faculty_name']
+        faculty_email = request.form['faculty_email']
+        other_details = request.form['other_details']
+        username = request.form['username']
+        password = request.form['password']
 
-    c.execute("INSERT INTO faculty (faculty_name, faculty_email, other_details, username, password) VALUES (?, ?, ?, ?, ?)",
-              (faculty_name, faculty_email, other_details, username, password))
-    conn.commit()
+        c.execute("INSERT INTO faculty (faculty_name, faculty_email, other_details, username, password) VALUES (?, ?, ?, ?, ?)",
+                (faculty_name, faculty_email, other_details, username, password))
+        conn.commit()
 
-    return admin_faculties()
+        return admin_faculties()
+    else:
+        return redirect(url_for('index'))
 
 # Route to update an existing faculty
 @admin.route('/admin/faculties/update', methods=['POST'])
 def update_faculty():
-    faculty_id = request.form['faculty_id']
-    faculty_name = request.form['faculty_name']
-    faculty_email = request.form['faculty_email']
-    other_details = request.form['other_details']
-    username = request.form['username']
-    password = request.form['password']
-
-    c.execute("UPDATE faculty SET faculty_name = ?, faculty_email = ?, other_details = ?, username = ?, password = ? WHERE faculty_id = ?",
-              (faculty_name, faculty_email, other_details, username, password, faculty_id))
-    conn.commit()
-
-    return admin_faculties()
-
-@admin.route('/admin/faculties/update/<int:faculty_id>', methods=['GET', 'POST'])
-def update_faculty_per_id(faculty_id=None):
-    if request.method == 'POST':
+    if 'admin_logged_in' in session:
+        faculty_id = request.form['faculty_id']
         faculty_name = request.form['faculty_name']
         faculty_email = request.form['faculty_email']
         other_details = request.form['other_details']
@@ -137,82 +151,69 @@ def update_faculty_per_id(faculty_id=None):
         password = request.form['password']
 
         c.execute("UPDATE faculty SET faculty_name = ?, faculty_email = ?, other_details = ?, username = ?, password = ? WHERE faculty_id = ?",
-                  (faculty_name, faculty_email, other_details, username, password, faculty_id))
+                (faculty_name, faculty_email, other_details, username, password, faculty_id))
         conn.commit()
 
         return admin_faculties()
     else:
-        c.execute("SELECT * FROM Faculty WHERE faculty_id = ?", (faculty_id,))
-        faculty = c.fetchone()
-        return render_template('admin/admin_update_faculties.html', faculty=faculty)
+        return redirect(url_for('index'))
+
+@admin.route('/admin/faculties/update/<int:faculty_id>', methods=['GET', 'POST'])
+def update_faculty_per_id(faculty_id=None):
+    if 'admin_logged_in' in session:
+        if request.method == 'POST':
+            faculty_name = request.form['faculty_name']
+            faculty_email = request.form['faculty_email']
+            other_details = request.form['other_details']
+            username = request.form['username']
+            password = request.form['password']
+
+            c.execute("UPDATE faculty SET faculty_name = ?, faculty_email = ?, other_details = ?, username = ?, password = ? WHERE faculty_id = ?",
+                    (faculty_name, faculty_email, other_details, username, password, faculty_id))
+            conn.commit()
+
+            return admin_faculties()
+        else:
+            c.execute("SELECT * FROM Faculty WHERE faculty_id = ?", (faculty_id,))
+            faculty = c.fetchone()
+            return render_template('admin/admin_update_faculties.html', faculty=faculty)
+    else:
+        return redirect(url_for('index'))
 
 # Route to delete a faculty
 @admin.route('/admin/faculties/delete', methods=['POST'])
 def delete_faculty():
-    faculty_id = request.form['faculty_id']
+    if 'admin_logged_in' in session:
+        faculty_id = request.form['faculty_id']
 
-    c.execute("DELETE FROM faculty WHERE faculty_id = ?", (faculty_id,))
-    conn.commit()
+        c.execute("DELETE FROM faculty WHERE faculty_id = ?", (faculty_id,))
+        conn.commit()
 
-    return admin_faculties()
+        return admin_faculties()
+    else:
+        return redirect(url_for('index'))
 
 @admin.route('/admin/meetings', methods=['GET'])
 def admin_meetings():
-    c.execute("SELECT * FROM Meeting")
-    meetings = c.fetchall()
-    return render_template('admin/admin_meetings.html', meetings=meetings)
+    if 'admin_logged_in' in session:
+        c.execute("SELECT * FROM Meeting")
+        meetings = c.fetchall()
+        return render_template('admin/admin_meetings.html', meetings=meetings)
+    else:
+        return redirect(url_for('index'))
 
 
 @admin.route('/admin/meetings/add', methods=['GET'])
 def add_meeting_form():
-    return render_template('admin/admin_add_meetings.html')
+    if 'admin_logged_in' in session:
+        return render_template('admin/admin_add_meetings.html')
+    else:
+        return redirect(url_for('index'))
 
 # Route to add a new meeting
 @admin.route('/admin/meetings/add', methods=['POST'])
 def add_meeting():
-    meeting_title = request.form['meeting_title']
-    meeting_date = request.form['meeting_date']
-    meeting_time = request.form['meeting_time']
-    meeting_duration = request.form['meeting_duration']
-    meeting_location = request.form['meeting_location']
-    meeting_description = request.form['meeting_description']
-    class_id = request.form['class_id']
-    meeting_status = request.form['meeting_status']
-    question = request.form['question']
-
-    c.execute("INSERT INTO Meeting (meeting_title, meeting_date, meeting_time, meeting_duration, meeting_location, meeting_description, class_id, meeting_status, question) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-              (meeting_title, meeting_date, meeting_time, meeting_duration, meeting_location, meeting_description, class_id, meeting_status, question))
-    conn.commit()
-
-    return admin_meetings()
-
-# Route to update an existing meeting
-@admin.route('/admin/meetings/update', methods=['POST'])
-def update_meeting():
-    meeting_id = request.form['meeting_id']
-    meeting_title = request.form['meeting_title']
-    meeting_date = request.form['meeting_date']
-    meeting_time = request.form['meeting_time']
-    meeting_duration = request.form['meeting_duration']
-    meeting_location = request.form['meeting_location']
-    meeting_description = request.form['meeting_description']
-    created_by = request.form['created_by']
-    created_at = request.form['created_at']
-    updated_at = request.form['updated_at']
-    class_id = request.form['class_id']
-    meeting_status = request.form['meeting_status']
-    question = request.form['question']
-
-    c.execute("UPDATE Meeting SET meeting_title = ?, meeting_date = ?, meeting_time = ?, meeting_duration = ?, meeting_location = ?, meeting_description = ?, created_by = ?, created_at = ?, updated_at = ?, class_id = ?, meeting_status = ?, question = ? WHERE meeting_id = ?",
-              (meeting_title, meeting_date, meeting_time, meeting_duration, meeting_location, meeting_description, created_by, created_at, updated_at, class_id, meeting_status, question, meeting_id))
-    conn.commit()
-
-    return admin_meetings()
-
-# Route to update a specific meeting
-@admin.route('/admin/meetings/update/<int:meeting_id>', methods=['GET', 'POST'])
-def update_meeting_per_id(meeting_id=None):
-    if request.method == 'POST':
+    if 'admin_logged_in' in session:
         meeting_title = request.form['meeting_title']
         meeting_date = request.form['meeting_date']
         meeting_time = request.form['meeting_time']
@@ -223,24 +224,75 @@ def update_meeting_per_id(meeting_id=None):
         meeting_status = request.form['meeting_status']
         question = request.form['question']
 
-        c.execute("UPDATE Meeting SET meeting_title = ?, meeting_date = ?, meeting_time = ?, meeting_duration = ?, meeting_location = ?, meeting_description = ?, class_id = ?, meeting_status = ?, question = ?, updated_at = datetime('now') WHERE meeting_id = ?",
-                  (meeting_title, meeting_date, meeting_time, meeting_duration, meeting_location, meeting_description, class_id, meeting_status, question, meeting_id))
+        c.execute("INSERT INTO Meeting (meeting_title, meeting_date, meeting_time, meeting_duration, meeting_location, meeting_description, class_id, meeting_status, question) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                (meeting_title, meeting_date, meeting_time, meeting_duration, meeting_location, meeting_description, class_id, meeting_status, question))
         conn.commit()
 
         return admin_meetings()
     else:
-        c.execute("SELECT * FROM Meeting WHERE meeting_id = ?", (meeting_id,))
-        meeting = c.fetchone()
-        return render_template('admin/admin_update_meetings.html', meeting=meeting)
+        return redirect(url_for('index'))
+
+# Route to update an existing meeting
+@admin.route('/admin/meetings/update', methods=['POST'])
+def update_meeting():
+    if 'admin_logged_in' in session:
+        meeting_id = request.form['meeting_id']
+        meeting_title = request.form['meeting_title']
+        meeting_date = request.form['meeting_date']
+        meeting_time = request.form['meeting_time']
+        meeting_duration = request.form['meeting_duration']
+        meeting_location = request.form['meeting_location']
+        meeting_description = request.form['meeting_description']
+        created_by = request.form['created_by']
+        created_at = request.form['created_at']
+        updated_at = request.form['updated_at']
+        class_id = request.form['class_id']
+        meeting_status = request.form['meeting_status']
+        question = request.form['question']
+
+        c.execute("UPDATE Meeting SET meeting_title = ?, meeting_date = ?, meeting_time = ?, meeting_duration = ?, meeting_location = ?, meeting_description = ?, created_by = ?, created_at = ?, updated_at = ?, class_id = ?, meeting_status = ?, question = ? WHERE meeting_id = ?",
+                (meeting_title, meeting_date, meeting_time, meeting_duration, meeting_location, meeting_description, created_by, created_at, updated_at, class_id, meeting_status, question, meeting_id))
+        conn.commit()
+
+        return admin_meetings()
+    else:
+        return redirect(url_for('index'))
+
+# Route to update a specific meeting
+@admin.route('/admin/meetings/update/<int:meeting_id>', methods=['GET', 'POST'])
+def update_meeting_per_id(meeting_id=None):
+    if 'admin_logged_in' in session:
+        if request.method == 'POST':
+            meeting_title = request.form['meeting_title']
+            meeting_date = request.form['meeting_date']
+            meeting_time = request.form['meeting_time']
+            meeting_duration = request.form['meeting_duration']
+            meeting_location = request.form['meeting_location']
+            meeting_description = request.form['meeting_description']
+            class_id = request.form['class_id']
+            meeting_status = request.form['meeting_status']
+            question = request.form['question']
+
+            c.execute("UPDATE Meeting SET meeting_title = ?, meeting_date = ?, meeting_time = ?, meeting_duration = ?, meeting_location = ?, meeting_description = ?, class_id = ?, meeting_status = ?, question = ?, updated_at = datetime('now') WHERE meeting_id = ?",
+                    (meeting_title, meeting_date, meeting_time, meeting_duration, meeting_location, meeting_description, class_id, meeting_status, question, meeting_id))
+            conn.commit()
+
+            return admin_meetings()
+        else:
+            c.execute("SELECT * FROM Meeting WHERE meeting_id = ?", (meeting_id,))
+            meeting = c.fetchone()
+            return render_template('admin/admin_update_meetings.html', meeting=meeting)
+    else:
+        return redirect(url_for('index'))
     
 @admin.route('/admin/meetings/delete', methods=['POST'])
 def delete_meeting():
-    meeting_id = request.form['meeting_id']
+    if 'admin_logged_in' in session:
+        meeting_id = request.form['meeting_id']
 
-    c.execute("DELETE FROM meeting WHERE meeting_id = ?", (meeting_id,))
-    conn.commit()
+        c.execute("DELETE FROM meeting WHERE meeting_id = ?", (meeting_id,))
+        conn.commit()
 
-    return admin_meetings()
-
-
-
+        return admin_meetings()
+    else:
+        return redirect(url_for('index'))
