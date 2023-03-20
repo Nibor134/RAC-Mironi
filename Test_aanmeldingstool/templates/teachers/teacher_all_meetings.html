@@ -9,6 +9,10 @@
     <label for="date-input">Datum:</label>
     <input type="date" id="date-input" class="form-control" required>
   </div>
+  <div class="col-md-3">
+    <label for="name-input">Lesnaam:</label>
+    <input type="text" id="name-input" class="form-control">
+  </div>
   <div class="col-md-2 mb-3">
     <button id="filter-button" class="btn btn-primary">Filter</button>
   </div>
@@ -22,7 +26,7 @@
 
 <script src="https://code.jquery.com/jquery-3.6.2.min.js"></script>
 <script>
-  $(document).ready(function() {
+ $(document).ready(function() {
     // Get the meetings data from the server
     $.ajax({
       url: '/api/all_meetings',
@@ -36,20 +40,26 @@
 
         // Handle the filter button click event
         $('#filter-button').click(function() {
-          // Get the selected date from the input field
+          // Get the selected date and name from the input fields
           var selectedDate = $('#date-input').val();
+          var selectedName = $('#name-input').val().toLowerCase();
 
-          // Filter meetings by the selected date
+          // Filter meetings by the selected date and name
           var filteredMeetings = meetings.filter(function(meeting) {
-            return meeting[2] === selectedDate;
+            var meetingDate = meeting[2];
+            var meetingName = meeting[1].toLowerCase();
+            return (meetingDate === selectedDate || !selectedDate) && (meetingName.includes(selectedName) || !selectedName);
           });
 
           // Render the filtered meetings
           renderMeetings(filteredMeetings);
         });
 
+        // Handle the reset button click event
         $('#reset-button').click(function() {
           renderMeetings(meetings);
+          $('#date-input').val('');
+          $('#name-input').val('');
         });
       },
       error: function(error) {
