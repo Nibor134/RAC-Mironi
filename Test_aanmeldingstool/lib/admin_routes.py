@@ -223,13 +223,13 @@ def update_meeting_per_id(meeting_id=None):
         meeting_status = request.form['meeting_status']
         question = request.form['question']
 
-        c.execute("UPDATE Meetings SET meeting_title = ?, meeting_date = ?, meeting_time = ?, meeting_duration = ?, meeting_location = ?, meeting_description = ?, class_id = ?, meeting_status = ?, question = ?, updated_at = datetime('now') WHERE meeting_id = ?",
+        c.execute("UPDATE Meeting SET meeting_title = ?, meeting_date = ?, meeting_time = ?, meeting_duration = ?, meeting_location = ?, meeting_description = ?, class_id = ?, meeting_status = ?, question = ?, updated_at = datetime('now') WHERE meeting_id = ?",
                   (meeting_title, meeting_date, meeting_time, meeting_duration, meeting_location, meeting_description, class_id, meeting_status, question, meeting_id))
         conn.commit()
 
         return admin_meetings()
     else:
-        c.execute("SELECT * FROM Meetings WHERE meeting_id = ?", (meeting_id,))
+        c.execute("SELECT * FROM Meeting WHERE meeting_id = ?", (meeting_id,))
         meeting = c.fetchone()
         return render_template('admin/admin_update_meetings.html', meeting=meeting)
     
