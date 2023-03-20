@@ -880,15 +880,41 @@ def get_all_classes():
     conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
     c = conn.cursor()
 
-    # Get the upcoming meetings
+    # Get all classes
     c.execute('SELECT class_id, classname FROM Class')
     klassen = c.fetchall()
 
     # Close the database connection
     conn.close()
 
-    # Return the meetings in the response
+    # Return the classes in the response
     return jsonify({'all_classes': klassen})
+
+@students_api.route('/api/add_class', methods=['POST'])
+def add_class():
+    if 'admin_logged_in' in session:
+        print(session)
+        # Parse the request data
+        data = request.json
+        class_name = data.get('classname')
+        
+        # Connect to the database
+        conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
+        c = conn.cursor()
+
+        # Add the new class to the database
+        c.execute('INSERT INTO Class (classname) VALUES (?)', 
+                        (class_name))
+
+        # Retrieve the ID of the newly created meeting
+        class_id = c.lastrowid
+
+        # Commit the changes and close the database connection
+        conn.commit()
+        conn.close()
+
+        # Return the class ID in the response
+        return jsonify({'message': 'Class created successfully.', 'class_id': class_id})
 
 # def insert_class(klas):
 #     inserted_class = {}

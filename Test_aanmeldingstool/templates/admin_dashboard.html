@@ -99,16 +99,47 @@
 	</div>
 	<div style="padding-top: 75px;" class="container">
 		<div class="card bg-light mb-3" style="max-width: 18rem;">
-			<div class="card-header">Alle Klassen
-				<a style="float: right;" href="#">Toevoegen</a></div>
+			<div class="card-header d-flex justify-content-between align-items-center">
+				<div>
+					Alle Klassen
+				</div>
+				<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addClass">
+					Toevoegen
+				</button>
+			</div>
 			<div class="card-body">
 				<div id="class-list">
 
 				</div>
 			</div>
-			</div>
-	  	</div>
+		</div>
 	</div>
+
+	<!-- Modal Toevoegen -->
+	<div class="modal fade" id="addClass" tabindex="-1" aria-labelledby="classModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+		  	<div class="modal-content">
+				<div class="modal-header">
+			  		<h5 class="modal-title" id="classModalLabel">Klas Toevoegen</h5>
+			  		<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<form id="create-class-form">
+						<div class="form-group">
+						  <label for="classname">Klasnaam:</label>
+						  <input type="text" class="form-control" id="classname" name="classname" required>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+			  		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+			  		<button type="submit" class="btn btn-primary">Toevoegen</button>
+				</div>
+		  	</div>
+		</div>
+	</div>
+	<script src="https://code.jquery.com/jquery-3.6.2.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 	<script>
 		function openNav() {
 			document.getElementById("mySidenav").style.width = "500px";
@@ -121,9 +152,6 @@
 			document.getElementById("main").style.marginRight = "0";
 			document.body.style.backgroundColor = "#fff7ea";
 		}
-	</script>
-	<script src="https://code.jquery.com/jquery-3.6.2.min.js"></script>
-	<script>
 	  $(document).ready(function() {
 		// Make a GET request to the API endpoint
 		$.ajax({
@@ -136,12 +164,14 @@
 			  var classId = klas[0];
 			  var className = klas[1];
 	
-			  var cardDiv = $('<div>');
-			  var cardText = $('<p style="display: inline-block; padding-right: 10px;" class="card-text">').text(classId);
-			  var cardSubText = $('<p style="display: inline-block;" class="card-text">').text(className);
+			  var cardDiv = $('<div style="height: 50px; vertical-align: middle;" class="d-flex justify-content-between align-items-center">');
+			  var cardText = $('<p style="margin-top: 15px;" class="card-text">').text(classId);
+			  var cardSubText = $('<p style="margin-top: 15px;" class="card-text">').text(className);
+		      var cardViewButton = $('<button type="submit" class="btn btn-danger">Delete</button>')
 	
 			  cardDiv.append(cardText);
 			  cardDiv.append(cardSubText);
+			  cardDiv.append(cardViewButton);
 	
 			  $('#class-list').append(cardDiv);
 			});
@@ -150,7 +180,28 @@
 			console.log(error);
 		  }
 		});
-	  });    
+	  });  
+	  
+	  $(document).ready(function() {
+        $('#create-class-form').submit(function(event) {
+          event.preventDefault();
+          $.ajax({
+            url: '/api/add_class',
+            type: 'POST',
+            data: JSON.stringify({
+              'classname': $('#classname').val(),
+            }),
+            contentType: 'application/json',
+            success: function(data) {
+                alert('Klas toegevoegd!');
+                window.location.href = '/classes/' + data.class_id;
+                },
+            error: function(jqXHR, textStatus, errorThrown) {
+              alert('Fout met toevoegen van klas: ' + textStatus);
+            }
+          });
+        });
+      });      
 	</script>
 </body>
 </html>
