@@ -144,3 +144,20 @@ footer .container {
     .col-11 {width: 91.66%;}
     .col-12 {width: 100%;}
   }
+
+  .btn-primary {
+    background-color: #3caad7;
+    border-color: #3caad7;
+  }
+  
+  .btn-primary:hover,
+  .btn-primary:focus {
+    background-color: #1f7ca8;
+    border-color: #1f7ca8;
+  }
+  
+  .btn-primary:active {
+    background-color: #1a6a8a;
+    border-color: #1a6a8a;
+  }
+  
