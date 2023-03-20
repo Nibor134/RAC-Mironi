@@ -41,7 +41,7 @@ def student_dashboard(events=[]):
                 'start': event_start,
                 'end': event_end
             })
-        return render_template('student_dashboard.html', name_s=name_s, events=events)
+        return render_template('students/student_dashboard.html', name_s=name_s, events=events)
     else:
         flash('Ongeldige inloggegevens.', 'danger')
         return redirect(url_for('login'))
@@ -65,7 +65,7 @@ def student_statistics():
         total_records = len(rows)
         attendance_percentage = round((attendance_counts['Aanwezig'] / total_records) * 100, 2)
 
-        return render_template('student_statistics.html', attendance_percentage=attendance_percentage)
+        return render_template('students/student_statistics.html', attendance_percentage=attendance_percentage)
     
     else:
         flash('Ongeldige inloggegevens.', 'danger')
@@ -104,7 +104,7 @@ def rooster():
             })
 
         # Geef de verwerkte ics gegevens door aan de template
-        return render_template('rooster.html', events=events)
+        return render_template('students/rooster.html', events=events)
     else:
         flash('Log alstublieft eerst in', 'danger')
     return redirect(url_for('login'))
@@ -112,7 +112,7 @@ def rooster():
 @student_route.route('/student/upcoming_meetings')
 def s_upcoming_meetings():
     if 'student_logged_in' in session:
-        return render_template('student_upcoming_meetings.html')
+        return render_template('students/student_upcoming_meetings.html')
     else:
         flash('Log alstublieft eerst in', 'danger')
     return redirect(url_for('login'))
@@ -124,7 +124,7 @@ def check_in(meeting_id):
         c = conn.cursor()
         c.execute('SELECT question FROM Meeting WHERE Meeting_id = ?', (meeting_id,))
         question = c.fetchone()[0]
-        return render_template('checkin2.html', meeting_id=meeting_id, question=question)
+        return render_template('students/checkin2.html', meeting_id=meeting_id, question=question)
     else:
         flash('Log alstublieft eerst in', 'danger')
         return redirect(url_for('login_for_redirect', meeting_id=meeting_id))

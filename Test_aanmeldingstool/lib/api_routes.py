@@ -432,7 +432,7 @@ def api_checkin(student, meeting):
 
     if not meeting_data:
         conn.close()
-        return jsonify({'error': f'Meeting {meeting} niet gevonden'}), 404
+        return jsonify({'error': f'Meeting {meeting} voor vandaag is niet gevonden'}), 404
 
     if meeting_data[11] != 'open' and meeting_data[11] != 'closed':
         conn.close()
