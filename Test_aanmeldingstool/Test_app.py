@@ -3,12 +3,14 @@ import sqlite3
 from lib.api_routes import students_api
 from lib.teacher_routes import teacher
 from lib.student_routes import student_route
+from lib.admin_routes import admin
 import socket
 
 app = Flask(__name__)
 app.register_blueprint(students_api)
 app.register_blueprint(teacher)
 app.register_blueprint(student_route)
+app.register_blueprint(admin)
 
 app.secret_key = 'your-secret-key'
 
