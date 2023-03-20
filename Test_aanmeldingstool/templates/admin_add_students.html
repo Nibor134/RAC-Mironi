@@ -1,5 +1,6 @@
-<!DOCTYPE html>
-<html>
+{% extends "base5.html" %}
+
+{% block content %}
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -10,21 +11,37 @@
     <link rel="shortcut icon" href="{{ url_for('static', filename='images/logo.svg') }}">
 </head>
 <body>
-    <a href="/admin/students">View All Students</a>
+    <br>
+    <a href="/admin/students" class="btn btn-secondary mb-3">Bekijk alle Studenten</a>
+    <div class="container">
     <form class="add-student" action="/admin/students/add" method="post">
-        <label for="student_name">Name:</label>
-        <input type="text" id="student_name" name="student_name"><br><br>
-        <label for="other_details">Other Details:</label>
-        <input type="text" id="other_details" name="other_details"><br><br>
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username"><br><br>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password"><br><br>
-        <label for="student_number">Student Number:</label>
-        <input type="text" id="student_number" name="student_number"><br><br>
-        <label for="class_id">Class ID:</label>
-        <input type="text" id="class_id" name="class_id"><br><br>
-        <input type="submit" value="Add Student">
-    </form>
+        <div class="mb-3">
+            <label for="student_name" class="form-label">Name:</label>
+            <input type="text" class="form-control" id="student_name" name="student_name">
+        </div>
+        <div class="mb-3">
+            <label for="other_details" class="form-label">Other Details:</label>
+            <input type="text" class="form-control" id="other_details" name="other_details">
+        </div>
+        <div class="mb-3">
+            <label for="username" class="form-label">Username:</label>
+            <input type="text" class="form-control" id="username" name="username">
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label">Password:</label>
+            <input type="password" class="form-control" id="password" name="password">
+        </div>
+        <div class="mb-3">
+            <label for="student_number" class="form-label">Student Number:</label>
+            <input type="text" class="form-control" id="student_number" name="student_number">
+        </div>
+        <div class="mb-3">
+            <label for="class_id" class="form-label">Class ID:</label>
+            <input type="text" class="form-control" id="class_id" name="class_id">
+        </div>
+        <button type="submit" class="btn btn-primary">Voeg student toe</button>
+    </form>    
+</div>
 </body>
-</html>
+{% endblock %}
+
