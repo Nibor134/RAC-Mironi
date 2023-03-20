@@ -106,14 +106,14 @@
 			<a href="">Aanwezigheid</a>
 			<a href="{{ url_for('admin.admin_faculties') }}">Faculteit</a>
 			<a href="{{ url_for('admin.admin_meetings') }}">Meetings</a>
-			<a href="">Klassen</a>
+			<a href="{{ url_for('admin.admin_classes') }}">Klassen</a>
 		</div>
         </body>
     <script src="https://code.jquery.com/jquery-3.6.2.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 	<script>
 		function openNav() {
-			document.getElementById("mySidenav").style.width = "300px";
+			document.getElementById("mySidenav").style.width = "500px";
 			document.getElementById("main").style.marginRight = "350px";
 			document.body.style.backgroundColor = "rgba(0, 0, 0, 0.3)";
 		}
