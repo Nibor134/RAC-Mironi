@@ -155,3 +155,92 @@ def delete_faculty():
     conn.commit()
 
     return admin_faculties()
+
+@admin.route('/admin/meetings', methods=['GET'])
+def admin_meetings():
+    c.execute("SELECT * FROM Meeting")
+    meetings = c.fetchall()
+    return render_template('admin/admin_meetings.html', meetings=meetings)
+
+
+@admin.route('/admin/meetings/add', methods=['GET'])
+def add_meeting_form():
+    return render_template('admin/admin_add_meetings.html')
+
+# Route to add a new meeting
+@admin.route('/admin/meetings/add', methods=['POST'])
+def add_meeting():
+    meeting_title = request.form['meeting_title']
+    meeting_date = request.form['meeting_date']
+    meeting_time = request.form['meeting_time']
+    meeting_duration = request.form['meeting_duration']
+    meeting_location = request.form['meeting_location']
+    meeting_description = request.form['meeting_description']
+    class_id = request.form['class_id']
+    meeting_status = request.form['meeting_status']
+    question = request.form['question']
+
+    c.execute("INSERT INTO Meeting (meeting_title, meeting_date, meeting_time, meeting_duration, meeting_location, meeting_description, class_id, meeting_status, question) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+              (meeting_title, meeting_date, meeting_time, meeting_duration, meeting_location, meeting_description, class_id, meeting_status, question))
+    conn.commit()
+
+    return admin_meetings()
+
+# Route to update an existing meeting
+@admin.route('/admin/meetings/update', methods=['POST'])
+def update_meeting():
+    meeting_id = request.form['meeting_id']
+    meeting_title = request.form['meeting_title']
+    meeting_date = request.form['meeting_date']
+    meeting_time = request.form['meeting_time']
+    meeting_duration = request.form['meeting_duration']
+    meeting_location = request.form['meeting_location']
+    meeting_description = request.form['meeting_description']
+    created_by = request.form['created_by']
+    created_at = request.form['created_at']
+    updated_at = request.form['updated_at']
+    class_id = request.form['class_id']
+    meeting_status = request.form['meeting_status']
+    question = request.form['question']
+
+    c.execute("UPDATE Meeting SET meeting_title = ?, meeting_date = ?, meeting_time = ?, meeting_duration = ?, meeting_location = ?, meeting_description = ?, created_by = ?, created_at = ?, updated_at = ?, class_id = ?, meeting_status = ?, question = ? WHERE meeting_id = ?",
+              (meeting_title, meeting_date, meeting_time, meeting_duration, meeting_location, meeting_description, created_by, created_at, updated_at, class_id, meeting_status, question, meeting_id))
+    conn.commit()
+
+    return admin_meetings()
+
+# Route to update a specific meeting
+@admin.route('/admin/meetings/update/<int:meeting_id>', methods=['GET', 'POST'])
+def update_meeting_per_id(meeting_id=None):
+    if request.method == 'POST':
+        meeting_title = request.form['meeting_title']
+        meeting_date = request.form['meeting_date']
+        meeting_time = request.form['meeting_time']
+        meeting_duration = request.form['meeting_duration']
+        meeting_location = request.form['meeting_location']
+        meeting_description = request.form['meeting_description']
+        class_id = request.form['class_id']
+        meeting_status = request.form['meeting_status']
+        question = request.form['question']
+
+        c.execute("UPDATE Meetings SET meeting_title = ?, meeting_date = ?, meeting_time = ?, meeting_duration = ?, meeting_location = ?, meeting_description = ?, class_id = ?, meeting_status = ?, question = ?, updated_at = datetime('now') WHERE meeting_id = ?",
+                  (meeting_title, meeting_date, meeting_time, meeting_duration, meeting_location, meeting_description, class_id, meeting_status, question, meeting_id))
+        conn.commit()
+
+        return admin_meetings()
+    else:
+        c.execute("SELECT * FROM Meetings WHERE meeting_id = ?", (meeting_id,))
+        meeting = c.fetchone()
+        return render_template('admin/admin_update_meetings.html', meeting=meeting)
+    
+@admin.route('/admin/meetings/delete', methods=['POST'])
+def delete_meeting():
+    meeting_id = request.form['meeting_id']
+
+    c.execute("DELETE FROM meeting WHERE meeting_id = ?", (meeting_id,))
+    conn.commit()
+
+    return admin_meetings()
+
+
+
