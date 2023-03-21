@@ -441,13 +441,13 @@ def update_attendance_per_id(class_id=None):
     else:
         return redirect(url_for('index'))
 
-# Route to delete a class
+# Route to delete a attendance
 @admin.route('/admin/attendance/delete', methods=['POST'])
 def delete_attendance():
     if 'admin_logged_in' in session:  
-        class_id = request.form['class_id']
+        attendance_id = request.form['attendance_id']
 
-        c.execute("DELETE FROM Class WHERE class_id = ?", (class_id,))
+        c.execute("DELETE FROM attendance WHERE attendance_id = ?", (attendance_id,))
         conn.commit()
 
         return admin_attendance()
