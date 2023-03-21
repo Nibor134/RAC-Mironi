@@ -424,20 +424,29 @@ def update_attendance():
 
 # Route to update a class
 @admin.route('/admin/attendance/update/<int:attendance_id>', methods=['GET', 'POST'])
-def update_attendance_per_id(class_id=None):
+def update_attendance_per_id(attendance_id=None):
     if 'admin_logged_in' in session:
         if request.method == 'POST':
-            class_name = request.form['class_name']
+            attendance_date = request.form['attendance_date']
+            attendance_time = request.form['attendance_time']
+            status = request.form['status']
+            student_number = request.form['student_number']
+            question = request.form['question']
+            answer = request.form['answer']
+            reason = request.form['reason']
+            student_id = request.form['student_id']
+            meeting_id = request.form['meeting_id']
+            class_id = request.form['class_id']
 
-            c.execute("UPDATE Class SET classname = ? WHERE class_id = ?",
-                    (class_name, class_id))
+            c.execute("UPDATE Attendance SET attendance_date = ?, attendance_time = ?, status = ?, Studentnumber = ?, Question = ?, Answer = ?, Reason = ?, student_id = ?, meeting_id = ?, class_id = ? WHERE attendance_id = ?",
+                    (attendance_date, attendance_time, status, student_number, question, answer, reason, student_id, meeting_id, class_id, attendance_id))
             conn.commit()
 
             return admin_attendance()
         else:
-            c.execute("SELECT * FROM Class WHERE class_id = ?", (class_id,))
-            classes = c.fetchone()
-            return render_template('admin/admin_update_class.html', classes=classes)
+            c.execute("SELECT * FROM Attendance WHERE attendance_id = ?", (attendance_id,))
+            attendances = c.fetchone()
+            return render_template('admin/admin_update_attendance.html', attendances=attendances)
     else:
         return redirect(url_for('index'))
 
