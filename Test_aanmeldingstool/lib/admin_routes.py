@@ -397,32 +397,50 @@ def add_attendance_form():
 @admin.route('/admin/attendance/add', methods=['POST'])
 def add_attendance():
     if 'admin_logged_in' in session:
-        class_name = request.form['class_name']
+        attendance_date = request.form['attendance_date']
+        attendance_time = request.form['attendance_time']
+        status = request.form['status']
+        student_number = request.form['student_number']
+        question = request.form['question']
+        answer = request.form['answer']
+        reason = request.form['reason']
+        student_id = request.form['student_id']
+        meeting_id = request.form['meeting_id']
+        class_id = request.form['class_id']
 
-        c.execute("INSERT INTO Class (classname) VALUES (?)",
-                (class_name,))
+        c.execute("INSERT INTO Attendance (attendance_date, attendance_time, status, Studentnumber, Question, Answer, Reason, student_id, meeting_id, class_id) VALUES (?,?,?,?,?,?,?,?,?,?)",
+                (attendance_date, attendance_time, status, student_number, question, answer, reason, student_id, meeting_id, class_id,))
         conn.commit()
 
         return admin_attendance()
     else:
         return redirect(url_for('index'))
 
-# Route to update an existing student
+# Route to update an existing attendance
 @admin.route('/admin/attendance/update', methods=['POST'])
 def update_attendance():
     if 'admin_logged_in' in session:
+        attendance_id = request.form['attendance_id']
+        attendance_date = request.form['attendance_date']
+        attendance_time = request.form['attendance_time']
+        status = request.form['status']
+        student_number = request.form['student_number']
+        question = request.form['question']
+        answer = request.form['answer']
+        reason = request.form['reason']
+        student_id = request.form['student_id']
+        meeting_id = request.form['meeting_id']
         class_id = request.form['class_id']
-        class_name = request.form['class_name']
 
-        c.execute("UPDATE Class SET classname = ? WHERE class_id = ?",
-                (class_name, class_id))
+        c.execute("UPDATE Attendance SET attendance_date = ?, attendance_time = ?, status = ?, Studentnumber = ?, Question = ?, Answer = ?, Reason = ?, student_id = ?, meeting_id = ?, class_id = ? WHERE attendance_id = ?",
+            (attendance_date, attendance_time, status, student_number, question, answer, reason, student_id, meeting_id, class_id, attendance_id))
         conn.commit()
 
         return admin_attendance()
     else:
         return redirect(url_for('index'))
 
-# Route to update a class
+# Route to update attendance
 @admin.route('/admin/attendance/update/<int:attendance_id>', methods=['GET', 'POST'])
 def update_attendance_per_id(attendance_id=None):
     if 'admin_logged_in' in session:

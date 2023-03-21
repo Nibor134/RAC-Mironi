@@ -15,11 +15,11 @@
                 <input type="hidden" name="attendance_id" value="{{ attendances[0] }}">
                 <div class="mb-3">
                     <label for="attendance_date" class="form-label">Datum:</label>
-                    <input type="text" class="form-control" id="attendance_date" name="attendance_date" value="{{ attendances[2] }}" required>
+                    <input type="date" class="form-control" id="attendance_date" name="attendance_date" value="{{ attendances[2] }}" required>
                 </div>
                 <div class="mb-3">
                     <label for="attendance_time" class="form-label">Tijd:</label>
-                    <input type="text" class="form-control" id="attendance_time" name="attendance_time" value="{{ attendances[3] }}" required>
+                    <input type="time" class="form-control" id="attendance_time" name="attendance_time" value="{{ attendances[3] }}" required>
                 </div>
                 <div class="mb-3">
                     <label for="status" class="form-label">Status:</label>
