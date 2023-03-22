@@ -1,5 +1,6 @@
-<!DOCTYPE html>
-<html>
+{% extends 'base5.html' %}
+
+{% block content %}
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -10,23 +11,42 @@
     <link rel="shortcut icon" href="{{ url_for('static', filename='images/logo.svg') }}">
 </head>
 <body>
-    <a href="/admin/students">View All Students</a>
-    <a href="/admin/students/add">Add Student</a>
-    <form class="edit-student" action="/admin/students/update/{{ student[0] }}" method="post">
-        <input type="hidden" name="student_id" value="{{ student[0] }}">
-        <label for="student_name">Name:</label>
-        <input type="text" id="student_name" name="student_name" value="{{ student[1] }}"><br><br>
-        <label for="other_details">Other Details:</label>
-        <input type="text" id="other_details" name="other_details" value="{{ student[2] }}"><br><br>
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" value="{{ student[3] }}"><br><br>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" value="{{ student[4] }}"><br><br>
-        <label for="student_number">Student Number:</label>
-        <input type="text" id="student_number" name="student_number" value="{{ student[5] }}"><br><br>
-        <label for="class_id">Class ID:</label>
-        <input type="text" id="class_id" name="class_id" value="{{ student[6] }}"><br><br>
-        <input type="submit" value="Update Student">
-    </form>
+    <br>
+    <br>
+    <div class="container">
+        <div class="row">
+          <div class="col-12">
+            <a href="/admin/students" class="btn btn-primary">Bekijk alle studenten</a>
+            <form class="edit-student" action="/admin/students/update/{{ student[0] }}" method="post">
+              <input type="hidden" name="student_id" value="{{ student[0] }}">
+              <div class="mb-3">
+                <label for="student_name" class="form-label">Name:</label>
+                <input type="text" id="student_name" name="student_name" value="{{ student[1] }}" class="form-control">
+              </div>
+              <div class="mb-3">
+                <label for="other_details" class="form-label">Other Details:</label>
+                <input type="text" id="other_details" name="other_details" value="{{ student[2] }}" class="form-control">
+              </div>
+              <div class="mb-3">
+                <label for="username" class="form-label">Username:</label>
+                <input type="text" id="username" name="username" value="{{ student[3] }}" class="form-control">
+              </div>
+              <div class="mb-3">
+                <label for="password" class="form-label">Password:</label>
+                <input type="password" id="password" name="password" value="{{ student[4] }}" class="form-control">
+              </div>
+              <div class="mb-3">
+                <label for="student_number" class="form-label">Student Number:</label>
+                <input type="text" id="student_number" name="student_number" value="{{ student[5] }}" class="form-control">
+              </div>
+              <div class="mb-3">
+                <label for="class_id" class="form-label">Class ID:</label>
+                <input type="text" id="class_id" name="class_id" value="{{ student[6] }}" class="form-control">
+              </div>
+              <button type="submit" class="btn btn-primary">Update Student</button>
+            </form>
+          </div>
+        </div>
+      </div>      
 </body>
-</html>
+{% endblock %}
