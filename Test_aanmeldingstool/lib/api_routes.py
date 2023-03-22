@@ -428,7 +428,7 @@ def api_checkin(student, meeting):
 
     meeting_query = c.execute('SELECT * FROM Meeting WHERE Meeting_id = ? AND Meeting_date = ?', (meeting, attendance_date))
     meeting_data = meeting_query.fetchone()
-    print(meeting_data)
+    
 
     if not meeting_data:
         conn.close()
@@ -440,6 +440,7 @@ def api_checkin(student, meeting):
 
     if meeting_data[11] == 'closed':
         conn.close()
+        print(meeting_data[11])
         return jsonify({'error': f'Check-in voor meeting {meeting} is gesloten'}), 403
     
      # Extract the meeting time from the database
@@ -467,7 +468,7 @@ def api_checkin(student, meeting):
         return jsonify({'message': f'Student {student} is succesvol ingecheckt voor meeting {meeting}'}), 200
     else:
         conn.close()
-        return jsonify({'error': f'Check-in voor meeting {meeting} is gesloten'}), 403
+        return jsonify({'error': f'Check-in voor meeting {meeting} is nog niet geopend'}), 403
 
 
 
