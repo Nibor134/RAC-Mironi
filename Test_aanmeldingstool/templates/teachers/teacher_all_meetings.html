@@ -25,6 +25,8 @@
   
 
 <script src="https://code.jquery.com/jquery-3.6.2.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsSHA/2.3.1/sha.js"></script>
+
 <script>
  $(document).ready(function() {
     // Get the meetings data from the server
@@ -67,6 +69,13 @@
       }
     });
 
+    function generateHash(meetingId) {
+      var salt = "your_salt_here";  // Use the same salt as in your Python code
+      var inputStr = meetingId + salt;
+      var shaObj = new jsSHA("SHA-256", "TEXT");
+      shaObj.update(inputStr);
+      return shaObj.getHash("HEX");
+    }
     // Render the given meetings in the meetings list container
     function renderMeetings(meetings) {
       var meetingsList = $('#meetings-list');
@@ -86,6 +95,7 @@
           var duration = meeting[4];
           var location = meeting[5];
           var description = meeting[6];
+          var meetingHash = generateHash(meetingId);
 
           // Create a card for the meeting
           var card = $('<div class="card col-md-3 mx-1">');
@@ -95,7 +105,7 @@
           var cardSubtitle = $('<h6 class="card-subtitle mb-2 text-muted">').text(date + ' ' + time);
           var cardText = $('<p class="card-text">').text(description);
           var cardlocation = $('<p class="card-text">').text(location);
-          var cardLink = $('<a class="btn btn-primary" href="/meetings/' + meetingId + '">').text('Ga naar details les');
+          var cardLink = $('<a class="btn btn-primary" href="/meetings/' + meetingHash + '">').text('Ga naar details les');
 
           cardBody.append(cardmeetingId);
           cardBody.append(cardTitle);
