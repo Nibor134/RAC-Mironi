@@ -3,6 +3,7 @@ from flask_cors import CORS
 import datetime
 import sqlite3
 import socket
+import hashlib
 
 teacher = Blueprint('teacher', __name__)
 
@@ -52,8 +53,30 @@ def attendance():
         flash('Log alstublieft eerst in', 'danger')
         return redirect(url_for('login'))
 
-@teacher.route('/meetings/<int:meeting_id>')   
-def meeting(meeting_id):
+def generate_hash(meeting_id):
+    salt = "your_salt_here"  # Choose a salt for added security
+    input_str = f"{meeting_id}{salt}"
+    return hashlib.sha256(input_str.encode()).hexdigest()
+
+@teacher.route('/meetings/<string:meeting_hash>')
+def meeting(meeting_hash):
+    
+    conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
+    c = conn.cursor()
+
+    # Fetch the maximum meeting ID from the Meeting table
+    c.execute('SELECT MAX(Meeting_id) FROM Meeting')
+    max_meeting_id = c.fetchone()[0]
+    meeting_id = None
+    for potential_id in range(1, max_meeting_id + 1):  # Replace max_meeting_id with the maximum meeting ID in your database
+        if generate_hash(potential_id) == meeting_hash:
+            meeting_id = potential_id
+            break
+
+    if meeting_id is None:
+        flash('Invalid meeting ID', 'danger')
+        return redirect(url_for('login'))
+
     if 'teacher_logged_in' in session: 
         hostname = socket.gethostname()
 

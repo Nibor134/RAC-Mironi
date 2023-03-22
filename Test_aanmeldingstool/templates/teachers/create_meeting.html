@@ -2,6 +2,7 @@
 
 {% block content %}
 <script src="https://code.jquery.com/jquery-3.6.2.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsSHA/2.3.1/sha.js"></script>
 <div class="container">
   <div class="row">
     <div class="col-md-6 offset-md-3">
@@ -60,6 +61,13 @@
 </div>
 
 <script>
+  function generateHash(meetingId) {
+    var salt = "your_salt_here";  // Use the same salt as in your Python code
+    var inputStr = meetingId + salt;
+    var shaObj = new jsSHA("SHA-256", "TEXT");
+    shaObj.update(inputStr);
+    return shaObj.getHash("HEX");
+  }
     $(document).ready(function() {
         $('#create-meeting-form').submit(function(event) {
           event.preventDefault();
@@ -78,9 +86,10 @@
             }),
             contentType: 'application/json',
             success: function(data) {
-                alert('Meeting gecreëerd!');
-                window.location.href = '/meetings/' + data.meeting_id;
-                },
+              alert('Meeting gecreëerd!');
+              var meetingHash = generateHash(data.meeting_id);
+              window.location.href = '/meetings/' + meetingHash;
+            },            
             error: function(jqXHR, textStatus, errorThrown) {
               alert('Fout met creëren meeting: ' + textStatus);
             }
