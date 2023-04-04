@@ -5,8 +5,6 @@ The entities that can be identified are:
 * Attendance
 * Meeting
 * Class
-* Courses
-* Schedule
 
 The attributes associated with each entity are:
 
@@ -71,12 +69,33 @@ The attributes associated with each entity are:
 * course_name
 * other_details
 
-**Schedule:**
+Relationships:
 
-* schedule_id
-* course_id
-* faculty_id
-* room_id
-* start_time
-* end_time
-* days
+
+Each STUDENT can be associated with one and only one CLASS.
+
+Each CLASS may have one or more STUDENTS.
+
+Each STUDENT can have one or more ATTENDANCE records.
+
+Each ATTENDANCE record must be associated with one and only one STUDENT.
+
+Each ATTENDANCE record must be associated with one and only one MEETING.
+
+Each MEETING can have one or more ATTENDANCE records.
+
+Each ATTENDANCE record must be associated with one and only one CLASS.
+
+Each CLASS can have one or more ATTENDANCE records.
+
+Each MEETING must be created by one and only one FACULTY member.
+
+Each FACULTY member can create one or more MEETINGS.
+
+Each MEETING can be associated with one and only one CLASS.
+
+Each CLASS may have one or more MEETINGS.
+
+Each STUDENT can attend one or more MEETINGS.
+
+Each MEETING can have one or more STUDENTS.
