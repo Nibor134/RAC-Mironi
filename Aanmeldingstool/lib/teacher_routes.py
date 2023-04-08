@@ -18,7 +18,7 @@ def create_class():
             location = request.form['location']
             
             # Insert class details into the database
-            conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
+            conn = sqlite3.connect('Aanmeldingstool/databases/attendence.db')
             c = conn.cursor()
             c.execute('INSERT INTO clas (class_name, date, time, location) VALUES (?, ?, ?, ?)', (class_name, date, time, location))
             conn.commit()
@@ -34,7 +34,7 @@ def create_class():
 @teacher.route('/view_classes')
 def view_classes():
     if 'teacher_logged_in' in session:
-        conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
+        conn = sqlite3.connect('Aanmeldingstool/databases/attendence.db')
         c = conn.cursor()
         c.execute('SELECT * FROM Schedule')
         classes = c.fetchall()
@@ -61,7 +61,7 @@ def generate_hash(meeting_id):
 @teacher.route('/meetings/<string:meeting_hash>')
 def meeting(meeting_hash):
     
-    conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
+    conn = sqlite3.connect('Aanmeldingstool/databases/attendence.db')
     c = conn.cursor()
 
     # Fetch the maximum meeting ID from the Meeting table
@@ -85,7 +85,7 @@ def meeting(meeting_hash):
         
 
         # Connect to the database
-        conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
+        conn = sqlite3.connect('Aanmeldingstool/databases/attendence.db')
         c = conn.cursor()
 
         # Retrieve the meeting with the requested ID from the database

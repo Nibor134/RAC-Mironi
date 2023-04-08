@@ -6,14 +6,15 @@ from datetime import datetime, timedelta
 from flask import Flask, request, jsonify, Blueprint, session
 from flask_cors import CORS
 import pytz
+from hashids import Hashids
 
 students_api = Blueprint('students_api', __name__)
 CORS(students_api, resources={r"/*": {"origins": "*"}})
-
+hashids = Hashids(salt='your_secret_salt_value_here')
 amsterdam_tz = pytz.timezone('Europe/Amsterdam')
     
 def connect_to_db():
-    conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
+    conn = sqlite3.connect('Aanmeldingstool/databases/attendence.db')
     return conn
 
 def insert_student(student):
@@ -418,7 +419,7 @@ def api_checkin(student, meeting):
     reason = data.get('reason')
 
     # Check if the student exists
-    conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
+    conn = sqlite3.connect('Aanmeldingstool/databases/attendence.db')
     c = conn.cursor()
     student_query = c.execute('SELECT * FROM Students WHERE Studentnumber LIKE ? OR Studentnumber LIKE ?', (f'{str(student)}%', f'0{str(student)}%'))
     student_data = student_query.fetchone()
@@ -484,7 +485,7 @@ def get_attendance_v2():
     meeting_id = request.args.get('meeting_id')
 
     # Connect to the database
-    conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
+    conn = sqlite3.connect('Aanmeldingstool/databases/attendence.db')
     cursor = conn.cursor()
 
     # Retrieve attendance records from the database for the current meeting_id
@@ -509,7 +510,7 @@ def get_attendance_v2():
 
 @students_api.route('/api/average_attendance', methods=['GET'])
 def get_average_attendance():
-    conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
+    conn = sqlite3.connect('Aanmeldingstool/databases/attendence.db')
     cursor = conn.cursor()
 
     # Retrieve attendance records from the database
@@ -582,7 +583,7 @@ def get_average_attendance():
 
 @students_api.route('/api/attendance', methods=['GET'])
 def get_attendance():
-    conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
+    conn = sqlite3.connect('Aanmeldingstool/databases/attendence.db')
     cursor = conn.cursor()
 
     # Retrieve attendance records from the database
@@ -612,7 +613,7 @@ def get_attendance():
 @students_api.route('/api/attendance/<int:attendance_id>', methods=['DELETE'])
 def delete_attendance(attendance_id):
     # Connect to the database
-    conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
+    conn = sqlite3.connect('Aanmeldingstool/databases/attendence.db')
     c = conn.cursor()
 
     # Delete the attendance record with the given attendance_id
@@ -636,7 +637,7 @@ def delete_all_attendance():
         return jsonify({'error': 'Start and end IDs not provided in request body.'}), 400
 
     # Connect to the database
-    conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
+    conn = sqlite3.connect('Aanmeldingstool/databases/attendence.db')
     c = conn.cursor()
 
     # Delete the attendance records with the given range of IDs
@@ -669,7 +670,7 @@ def create_meeting():
         
 
         # Connect to the database
-        conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
+        conn = sqlite3.connect('Aanmeldingstool/databases/attendence.db')
         c = conn.cursor()
 
         # Add the new meeting to the database
@@ -689,7 +690,7 @@ def create_meeting():
 @students_api.route('/api/close-meeting/<int:meeting>', methods=['POST'])
 def api_close_meeting(meeting):
     # Check if the meeting exists
-    conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
+    conn = sqlite3.connect('Aanmeldingstool/databases/attendence.db')
     c = conn.cursor()
     attendance_date = datetime.now().strftime('%Y-%m-%d')
     attendance_time = datetime.now().strftime('%H:%M:%S')
@@ -752,7 +753,7 @@ def delete_all_meetings():
         return jsonify({'error': 'Start and end IDs not provided in request body.'}), 400
 
     # Connect to the database
-    conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
+    conn = sqlite3.connect('Aanmeldingstool/databases/attendence.db')
     c = conn.cursor()
 
     # Delete the attendance records with the given range of IDs
@@ -776,7 +777,7 @@ def delete_all_students():
         return jsonify({'error': 'Start and end IDs not provided in request body.'}), 400
 
     # Connect to the database
-    conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
+    conn = sqlite3.connect('Aanmeldingstool/databases/attendence.db')
     c = conn.cursor()
 
     # Delete the attendance records with the given range of IDs
@@ -797,7 +798,7 @@ def insert_students():
     if not students:
         return jsonify({'message': 'No data provided'}), 400
 
-    conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
+    conn = sqlite3.connect('Aanmeldingstool/databases/attendence.db')
     c = conn.cursor()
 
     for student in students:
@@ -809,7 +810,7 @@ def insert_students():
 @students_api.route('/api/all_meetings', methods=['GET'])
 def get_meetings():
     # Connect to the database
-    conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
+    conn = sqlite3.connect('Aanmeldingstool/databases/attendence.db')
     c = conn.cursor()
 
     # Get all meetings
@@ -826,7 +827,7 @@ def get_meetings():
 @students_api.route('/api/upcoming_meetings', methods=['GET'])
 def get_upcoming_meetings():
     # Connect to the database
-    conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
+    conn = sqlite3.connect('Aanmeldingstool/databases/attendence.db')
     c = conn.cursor()
 
     # Get the upcoming meetings
@@ -878,7 +879,7 @@ def api_getmeetings():
 @students_api.route('/api/all_classes', methods=['GET'])
 def get_all_classes():
     # Connect to the database
-    conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
+    conn = sqlite3.connect('Aanmeldingstool/databases/attendence.db')
     c = conn.cursor()
 
     # Get all classes
@@ -900,7 +901,7 @@ def add_class():
         class_name = data.get('classname')
         
         # Connect to the database
-        conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
+        conn = sqlite3.connect('Aanmeldingstool/databases/attendence.db')
         c = conn.cursor()
 
         # Add the new class to the database

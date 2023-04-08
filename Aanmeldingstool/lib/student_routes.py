@@ -8,7 +8,7 @@ import pytz
 student_route = Blueprint('student_route', __name__)
 amsterdam_tz = pytz.timezone('Europe/Amsterdam')
 
-conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db', check_same_thread=False)
+conn = sqlite3.connect('Aanmeldingstool/databases/attendence.db', check_same_thread=False)
 c = conn.cursor()
 
 @student_route.route('/student_dashboard')
@@ -50,7 +50,7 @@ def student_dashboard(events=[]):
 def student_statistics():
     if 'student_logged_in' in session:
      # Retrieve attendance records for the logged in student from the database
-        conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
+        conn = sqlite3.connect('Aanmeldingstool/databases/attendence.db')
         cursor = conn.cursor()
         cursor.execute('SELECT Students.student_name, Attendance.Status FROM Students INNER JOIN Attendance ON Students.Student_id=Attendance.Student_id WHERE Students.studentnumber = ?', (session['username'],))
         rows = cursor.fetchall()
@@ -120,7 +120,7 @@ def s_upcoming_meetings():
 @student_route.route('/checkin/<int:meeting_id>', methods=['GET'])
 def check_in(meeting_id):
     if 'student_logged_in' in session:
-        conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db')
+        conn = sqlite3.connect('Aanmeldingstool/databases/attendence.db')
         c = conn.cursor()
         c.execute('SELECT question FROM Meeting WHERE Meeting_id = ?', (meeting_id,))
         question = c.fetchone()[0]

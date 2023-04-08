@@ -6,7 +6,7 @@ import socket
 
 admin = Blueprint('admin', __name__)
 
-conn = sqlite3.connect('Test_aanmeldingstool/databases/attendence.db', check_same_thread=False)
+conn = sqlite3.connect('Aanmeldingstool/databases/attendence.db', check_same_thread=False)
 c = conn.cursor()
 
 
