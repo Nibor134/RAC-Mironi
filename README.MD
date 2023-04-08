@@ -1,4 +1,4 @@
-English, scroll down for Dutch
+# English, scroll down for Dutch
 
 # Introduction
 This Attendance Tool is a web-based application designed for keeping track of student attendance in classes, meetings, and events. The tool allows teachers and Study career coaches to easily manage attendance records, track students' participation and engagement.
@@ -77,7 +77,7 @@ Milan Kreukniet
 Robin Winkels
 ```
 
-Dutch
+# Dutch
 
 # Introductie
 Deze Aanwezigheidstool is een webgebaseerde applicatie ontworpen om de aanwezigheid van studenten bij te houden in lessen, meetings en evenementen. De tool maakt het voor docenten en studieloopbaancoaches gemakkelijk om aanwezigheidsrecords te beheren en de deelname en betrokkenheid van studenten bij te houden.
